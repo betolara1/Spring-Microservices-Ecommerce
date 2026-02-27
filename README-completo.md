@@ -462,7 +462,7 @@ docker-compose -f docker-compose.overview.yml down
 # Remover volumes (limpar dados)
 docker-compose -f docker-compose.overview.yml down -v
 
-# Limpar sistema
+# Limpar sistema 
 docker system prune -f
 
 # Criar a Network de conexão local entre os microserviços
@@ -470,6 +470,7 @@ docker network create ecommerce-network
 
 # Reiniciar
 docker-compose -f docker-compose.overview.yml up -d
+docker-compose -f docker-compose.overview.yml up -d --build
 ```
 
 ### 📊 Scripts de Diagnóstico

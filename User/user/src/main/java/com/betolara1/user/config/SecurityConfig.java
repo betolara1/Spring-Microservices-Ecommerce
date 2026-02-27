@@ -2,6 +2,8 @@ package com.betolara1.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -10,9 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.betolara1.jwt_package.security.JwtAuthFilter;
+import com.betolara1.user.security.JwtAuthFilter;
 
-@Configuration
+// Nome customizado para evitar conflito com o SecurityConfig do jwt-package
+// O jwt-package já fornece PasswordEncoder e AuthenticationManager como beans
+@Configuration("userSecurityConfig")
 @EnableWebSecurity
 public class SecurityConfig {
 
@@ -45,9 +49,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Bean necessário para o UserService codificar senhas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // 2. Pegamos o AuthenticationManager pronto da configuração do Spring
+    // O AuthenticationManager é o responsável por autenticar as credenciais do
+    // usuário
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

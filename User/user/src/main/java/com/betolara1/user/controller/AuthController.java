@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betolara1.jwt_package.security.JwtUtil;
+import com.betolara1.user.security.JwtUtil;
 import com.betolara1.user.DTO.request.LoginRequest;
 import com.betolara1.user.DTO.request.RegisterRequest;
 import com.betolara1.user.DTO.response.LoginResponse;
@@ -35,10 +35,12 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    // O RegisterRequest é um DTO que contém os campos necessários para o registro, como username e password. 
+    // O RegisterRequest é um DTO que contém os campos necessários para o registro,
+    // como username e password.
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         // O método saveUser já cuida de codificar a senha, então passamos a senha crua
-        // mesmo que o DTO tenha a senha crua, pois o serviço vai lidar com isso de forma segura
+        // mesmo que o DTO tenha a senha crua, pois o serviço vai lidar com isso de
+        // forma segura
         User user = userService.saveUser(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(new UserDTO(user));
     }
