@@ -217,10 +217,13 @@ microservico/
 
 ## 🔗 Endpoints Disponíveis
 
-### User Service (8080) - Autenticação
+### User Service (8080) - Autenticação e Usuários
 
 - `POST /auth/register` - Registrar novo usuário
 - `POST /auth/login` - Fazer login
+- `GET /users/{id}` - Buscar perfil de usuário (protegido)
+- `PUT /users/{id}` - Atualizar dados do usuário (protegido)
+- `DELETE /users/{id}` - Excluir usuário (protegido)
 
 ### Product Service (8083)
 
