@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.betolara1.user.model.User;
 import com.betolara1.user.repository.UserRepository;
+import com.betolara1.user.exception.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +40,7 @@ public class UserService implements UserDetailsService {
 
     public User updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
 
         user.setName(updatedUser.getName());
         user.setEmail(updatedUser.getEmail());
@@ -51,14 +52,14 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
         userRepository.delete(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado: " + username));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

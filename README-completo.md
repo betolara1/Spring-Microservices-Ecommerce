@@ -474,6 +474,9 @@ docker network create ecommerce-network
 # Reiniciar
 docker-compose -f docker-compose.overview.yml up -d
 docker-compose -f docker-compose.overview.yml up -d --build
+
+# Reiniciar um microserviço específico
+docker-compose up -d --build user-service
 ```
 
 ### 📊 Scripts de Diagnóstico

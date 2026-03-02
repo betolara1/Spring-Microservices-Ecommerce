@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.betolara1.user.DTO.response.UserDTO;
 import com.betolara1.user.model.User;
 import com.betolara1.user.service.UserService;
+import com.betolara1.user.exception.NotFoundException;
 
 @RestController
 @RequestMapping("/users")
@@ -21,9 +22,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        User user = userService.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuario não encontrado com username: " + username));
+        return ResponseEntity.ok(new UserDTO(user));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-        User user = userService.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.findById(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
         return ResponseEntity.ok(new UserDTO(user));
     }
 
@@ -40,5 +47,4 @@ public class UserController {
 
         return ResponseEntity.ok(userDTOUpdated);
     }
-
 }
