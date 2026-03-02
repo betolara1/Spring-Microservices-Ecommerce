@@ -1,7 +1,11 @@
 package com.betolara1.user.service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor // Cria o construtor automaticamente para os campos final
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository; // Injeção de dependência via construtor, por isso usa o final
     private final PasswordEncoder passwordEncoder; // Injeção de dependência via construtor, por isso usa o final
@@ -28,7 +32,7 @@ public class UserService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    
+
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
@@ -49,5 +53,16 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                new ArrayList<>());
     }
 }

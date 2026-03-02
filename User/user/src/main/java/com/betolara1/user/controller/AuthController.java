@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.betolara1.user.security.JwtUtil;
+import com.betolara1.jwt_package.security.JwtUtil;
 import com.betolara1.user.DTO.request.LoginRequest;
 import com.betolara1.user.DTO.request.RegisterRequest;
 import com.betolara1.user.DTO.response.LoginResponse;
