@@ -61,6 +61,6 @@ public class AuthController {
             return ResponseEntity.ok(new LoginResponse(token, user.get().getUsername()));
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario ou senha inválidos");
     }
 }
