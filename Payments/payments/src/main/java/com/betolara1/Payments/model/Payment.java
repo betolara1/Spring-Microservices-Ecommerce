@@ -1,7 +1,8 @@
 package com.betolara1.Payments.model;
 
-import java.sql.Time;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,12 +17,19 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long order_id;
-    private String transaction_id;
-    private Time payment_date;
+
+    @Column(unique = true)
+    private Long orderId;
+
+    @Column(unique = true)
+    private String transactionId;
+
+    private LocalDateTime paymentDate;
+
     private Status status;
-    private int amount;
-    private String payment_method;
+
+    private double amount;
+    private String paymentMethod;
 
     public enum Status {
         PENDING,
@@ -29,6 +37,4 @@ public class Payment {
         FAILED,
         REFUNDED
     }
-
-
 }
