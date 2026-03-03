@@ -1,4 +1,6 @@
-package com.betolara1.Product.dto;
+package com.betolara1.Product.dto.response;
+
+import java.math.BigDecimal;
 
 import com.betolara1.Product.model.Product;
 
@@ -10,7 +12,7 @@ public class ProductDTO {
     private String sku;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Long categoryId;
     private String imageUrl;
     private boolean active;

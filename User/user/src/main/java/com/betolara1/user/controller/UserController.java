@@ -4,10 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
 
 import com.betolara1.user.DTO.response.UserDTO;
 import com.betolara1.user.model.User;
@@ -21,6 +23,20 @@ public class UserController {
     private final UserService userService;
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+    
+    @GetMapping("/listAll")
+    public ResponseEntity<Page<User>> listAll(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        
+        Page<User> list = userService.findAllUsers(page, size);
+
+        if (list.isEmpty()) {
+            throw new NotFoundException("Nenhum usuário cadastrado.");
+        }
+
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{identifier}")
@@ -54,14 +70,5 @@ public class UserController {
         UserDTO userDTOUpdated = new UserDTO(userDB);
 
         return ResponseEntity.ok(userDTOUpdated);
-    }
-
-    @GetMapping("/listAll")
-    public ResponseEntity<Page<User>> listar(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
-        
-        Page<User> list = userService.findAllUsers(page, size);
-        return ResponseEntity.ok(list);
     }
 }

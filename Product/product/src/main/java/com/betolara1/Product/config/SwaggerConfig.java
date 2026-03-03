@@ -1,4 +1,4 @@
-package com.betolara1.user.config;
+package com.betolara1.Product.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Ecommerce User API")
+                        .title("Ecommerce Product API")
                         .version("1.0")
-                        .description("API para autenticação e autorização de usuários em um sistema de ecommerce"));
+                        .description("API para gerenciamento de produtos em um sistema de ecommerce"));
     }
 }

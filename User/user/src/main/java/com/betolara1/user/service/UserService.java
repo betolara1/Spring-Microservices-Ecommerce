@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.betolara1.user.model.User;
 import com.betolara1.user.repository.UserRepository;
 import com.betolara1.user.exception.NotFoundException;
@@ -23,6 +25,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository; // Injeção de dependência via construtor, por isso usa o final
     private final PasswordEncoder passwordEncoder; // Injeção de dependência via construtor, por isso usa o final
 
+    // Adicionado endpoint no user para listar todos os usuarios, com paginação 
     public Page<User> findAllUsers(int page, int size) {
         return userRepository.findAll(PageRequest.of(page, size));
     }
@@ -32,7 +35,7 @@ public class UserService implements UserDetailsService {
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setPassword(encodedPassword);
-        newUser.setRole("ROLE_USER"); // Define um papel padrão para novos usuários
+        newUser.setRole("ADMIN"); // Define um papel padrão para novos usuários
         return userRepository.save(newUser);
     }
 
@@ -45,8 +48,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUser(Long id, User updatedUser) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
 
         user.setName(updatedUser.getName());
         user.setEmail(updatedUser.getEmail());
@@ -57,18 +59,16 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
         userRepository.delete(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado: " + username));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado: " + username));
 
         // Pega o papel do usuário ou define ROLE_USER se estiver nulo
-        String userRole = user.getRole() != null ? user.getRole() : "ROLE_USER";
+        String userRole = user.getRole() != null ? user.getRole() : "ADMIN";
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
