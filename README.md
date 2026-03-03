@@ -2,7 +2,7 @@
 
 Um projeto de e-commerce desenvolvido com **Spring Boot 4.0.1/4.0.2** e **Java 21**, utilizando arquitetura de **microserviços** para aprender e praticar várias funcionalidades avançadas do Spring Boot.
 
-> ✅ **Status:** Projeto funcional - Cinco microserviços operacionais
+> 🚧 **Status:** Em desenvolvimento - Apenas o **User Service** está concluído. RabbitMQ não está funcionando ainda.
 
 ## 📋 Sobre o Projeto
 
@@ -45,7 +45,7 @@ meu-ecommerce-microservicos/
 - **Descrição:** CRUD de produtos, categorias e controle de preços
 - **Java Version:** 21
 - **Dependências principais:** Spring Data JPA, Spring AMQP, Spring MVC
-- **Status:** ✅ Concluído
+- **Status:** 🚧 Em construção
 - **Banco de Dados:** PostgreSQL (product_db)
 
 #### **Inventory (Inventário)**
@@ -53,7 +53,7 @@ meu-ecommerce-microservicos/
 - **Descrição:** Verifica disponibilidade, reserva e controle de estoque de produtos
 - **Java Version:** 21
 - **Dependências principais:** Spring Data JPA, Spring AMQP, Spring MVC
-- **Status:** ✅ Concluído
+- **Status:** 🚧 Em construção
 - **Banco de Dados:** PostgreSQL (inventory_db)
 
 #### **Order (Pedidos)**
@@ -61,7 +61,7 @@ meu-ecommerce-microservicos/
 - **Descrição:** Recebe pedidos, gerencia status da compra e histórico de transações
 - **Java Version:** 21
 - **Dependências principais:** Spring Data JPA, Spring AMQP, Spring MVC
-- **Status:** ✅ Concluído
+- **Status:** 🚧 Em construção
 - **Banco de Dados:** PostgreSQL (order_db)
 
 #### **Payments (Pagamentos)**
@@ -69,7 +69,7 @@ meu-ecommerce-microservicos/
 - **Descrição:** Processamento de transações financeiras e gestão de pagamentos
 - **Java Version:** 21
 - **Dependências principais:** Spring Data JPA, Spring AMQP, Spring MVC
-- **Status:** ✅ Concluído
+- **Status:** 🚧 Em construção
 - **Banco de Dados:** PostgreSQL (payments_db)
 
 ## 🔧 Tecnologias Utilizadas
@@ -120,7 +120,7 @@ Isso iniciará:
 - ✅ Product Service (8083)
 - ✅ Payments Service (8084)
 
-**Status:** Docker Compose com 5 microserviços operacionais 100% 🐳
+**Status:** 🚧 Em desenvolvimento - Docker Compose em fase de ajustes (RabbitMQ pendente) 🐳
 
 ### 3. Executar Localmente (Desenvolvimento)
 
@@ -516,7 +516,7 @@ Este script verifica:
 
 ## 👨‍💻 Autor
 
-**Ralf Betolara**
+**Roberto Lara**
 
 ## 📄 Licença
 
@@ -525,4 +525,4 @@ Projeto de aprendizado pessoal.
 ---
 
 **Última atualização:** Janeiro de 2026  
-**Status:** 5 microserviços operacionais ✅ | Docker Compose 100% funcional 🐳 | Problemas de conexão RESOLVIDOS 🔧 | Pronto para produção 🚀
+**Status:** 🚧 Apenas User Service operacional | Outros serviços em construção | RabbitMQ não está funcionando ainda �
