@@ -51,6 +51,16 @@ public class ProductService {
         return new ProductDTO(product);
     }
 
+    public ProductDTO getProductByCategoryId(Long categoryId) {
+        Product product = productRepository.findByCategoryId(categoryId).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID da categoria: " + categoryId));
+        return new ProductDTO(product);
+    }
+
+    public ProductDTO getProductByActive(boolean active) {
+        Product product = productRepository.findByActive(active).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID da categoria: " + active));
+        return new ProductDTO(product);
+    }
+
     public ProductDTO getProductByName(String name) {
         Product product = productRepository.findByName(name).orElseThrow(() -> new NotFoundException("Produto não encontrado com nome: " + name));
         return new ProductDTO(product);

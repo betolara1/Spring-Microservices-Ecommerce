@@ -1,6 +1,7 @@
 package com.betolara1.Product.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +18,8 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
     private String sku;
     private String name;
     private String description;
@@ -26,4 +29,7 @@ public class Product {
     private Long categoryId;
     private String imageUrl;
     private boolean active;
+    
+    private LocalDateTime createdAt; 
+    private LocalDateTime updatedAt;
 }

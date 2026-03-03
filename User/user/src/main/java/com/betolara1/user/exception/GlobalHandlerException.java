@@ -21,8 +21,7 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE RECURSO NÃO ENCONTRADO (404)
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<StandardErrorDTO> handleRecursoNaoEncontrado(NotFoundException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleRecursoNaoEncontrado(NotFoundException ex, HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),
@@ -65,13 +64,11 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE ERROS DE VALIDAÇÃO (400)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardErrorDTO> handleValidationException(MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-        StringBuilder errorMessages = new StringBuilder("Erros de validação: ");
+        ValidationErrorDTO errorMessages = new ValidationErrorDTO();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            errorMessages.append("[").append(fieldError.getField()).append("] ").append(fieldError.getDefaultMessage())
-                    .append("; ");
+            errorMessages.addError(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
         StandardErrorDTO erro = new StandardErrorDTO(
@@ -86,8 +83,7 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE VIOLAÇÃO DE INTEGRIDADE (409) - Ex: username duplicado
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<StandardErrorDTO> handleDataIntegrityException(DataIntegrityViolationException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleDataIntegrityException(DataIntegrityViolationException ex, HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),
@@ -101,8 +97,7 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE RECURSO NÃO ENCONTRADO NO ENDPOINT (404)
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<StandardErrorDTO> handleNoResourceFoundException(NoResourceFoundException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),

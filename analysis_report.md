@@ -143,7 +143,7 @@ Cada serviço expõe sua própria porta (8080-8084). **Um API Gateway (Spring Cl
 - Faz roteamento inteligente (`/api/users/**` → User Service)
 - Centraliza autenticação JWT
 - Permite rate limiting, CORS, logging
-
+date
 ---
 
 ### 15. Sem Circuit Breaker (Resilience4j)
@@ -260,3 +260,6 @@ Fase 5 — Arquitetura avançada
   ├─ 21. Tracing distribuído
   └─ 22. GitHub Actions CI/CD
 ```
+
+
+MELHORAR AS CONSULTAS DE TODOS AS ROTAS

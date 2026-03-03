@@ -42,7 +42,7 @@ public class ProductController {
         return ResponseEntity.ok(list);
     }
 
-    // Busca por ID ou SKU
+    // Busca por ID ou nome
     @GetMapping("/{identifier}")
     public ResponseEntity<ProductDTO> getProductByIdentifier(@PathVariable String identifier) {
         ProductDTO product;
@@ -50,15 +50,21 @@ public class ProductController {
         if (identifier.matches("\\d+")) {
             product = productService.getProductById(Long.parseLong(identifier));
         } else {
-            product = productService.getProductBySku(identifier);
+            product = productService.getProductByName(identifier);
         }
 
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<ProductDTO> getProductByName(@PathVariable String name) {
-        ProductDTO product = productService.getProductByName(name);
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ProductDTO> getProductByCategoryId(@PathVariable Long categoryId) {
+        ProductDTO product = productService.getProductByCategoryId(categoryId);
+        return ResponseEntity.ok(product);
+    }
+
+    @GetMapping("/active/{active}")
+    public ResponseEntity<ProductDTO> getProductByActive(@PathVariable boolean active) {
+        ProductDTO product = productService.getProductByActive(active);
         return ResponseEntity.ok(product);
     }
 
@@ -79,8 +85,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Produto deletado com sucesso.");
     }
 }
