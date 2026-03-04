@@ -26,12 +26,12 @@ public class Payment {
     private String transactionId;
 
     private LocalDateTime paymentDate;
-
     private Status status;
 
+    @Column(precision = 10, scale = 2)
     private BigDecimal amount;
-    private String paymentMethod;
 
+    private String paymentMethod;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

@@ -1,14 +1,26 @@
 # Estágio 1: Build
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /build
-COPY . .
-RUN mvn -f order/pom.xml clean package -DskipTests
 
-# Estágio 2: Runtime
+# 1. Copia o Maven Wrapper e o pom.xml primeiro
+COPY order/.mvn/ .mvn
+COPY order/mvnw order/pom.xml ./
+
+# 2. Baixa as dependências (camada pesada que será cacheada)
+# Isso só rodará de novo se o seu pom.xml mudar
+RUN ./mvnw dependency:go-offline
+
+# 3. Agora sim copia o código fonte e gera o JAR
+COPY order/src ./src
+RUN ./mvnw clean package -DskipTests
+
+
+# Estágio 2: Runtime (Imagem final bem leve)
 FROM eclipse-temurin:21-jre-jammy
-ARG JAR_FILE=order/target/*.jar
-COPY --from=builder /build/${JAR_FILE} app.jar
+WORKDIR /app
+
+# Copia apenas o JAR do estágio anterior
+COPY --from=builder /build/target/*.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-Xmx512m", "-Xms256m", "-jar", "/app.jar"]
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:8080/ || exit 1
+ENTRYPOINT ["java", "-jar", "app.jar"]
