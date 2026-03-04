@@ -1,34 +1,25 @@
 package com.betolara1.Payments.dto.request;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.NotBlank;
+import com.betolara1.Payments.model.Payment;
+
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 
 @Data
 public class UpdatePaymentsRequest {
-    @NotBlank(message = "Order ID is required")
     private Long orderId;
 
-    @NotBlank(message = "Transaction ID is required")
     private String transactionId;
 
-    @NotBlank(message = "Payment date is required")
     private LocalDateTime paymentDate;
 
-    @NotBlank(message = "Status is required")
-    private Status status;
+    private Payment.Status status;
 
-    @NotBlank(message = "Amount is required")
-    private double amount;
+    @DecimalMin("0.01")
+    private BigDecimal amount;
 
-    @NotBlank(message = "Payment method is required")
     private String paymentMethod;
-
-    public enum Status {
-        PENDING,
-        COMPLETED,
-        FAILED,
-        REFUNDED
-    }
 }

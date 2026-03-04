@@ -68,10 +68,9 @@ public class GlobalHandlerException {
     public ResponseEntity<StandardErrorDTO> handleValidationException(MethodArgumentNotValidException ex,
             HttpServletRequest request) {
 
-        StringBuilder errorMessages = new StringBuilder("Erros de validação: ");
+        ValidationErrorDTO errorMessages = new ValidationErrorDTO();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            errorMessages.append("[").append(fieldError.getField()).append("] ").append(fieldError.getDefaultMessage())
-                    .append("; ");
+            errorMessages.addError(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
         StandardErrorDTO erro = new StandardErrorDTO(

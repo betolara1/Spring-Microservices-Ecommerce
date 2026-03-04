@@ -26,6 +26,7 @@ public class Product {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
+    
     private Long categoryId;
     private String imageUrl;
     private boolean active;

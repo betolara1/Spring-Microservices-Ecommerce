@@ -1,5 +1,6 @@
 package com.betolara1.Payments.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -28,8 +29,11 @@ public class Payment {
 
     private Status status;
 
-    private double amount;
+    private BigDecimal amount;
     private String paymentMethod;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public enum Status {
         PENDING,

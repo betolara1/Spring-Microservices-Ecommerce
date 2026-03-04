@@ -28,6 +28,22 @@ public class PaymentService {
         return payments.map(PaymentDTO::new);
     }
 
+    public Page<PaymentDTO> getPaymentByStatus(int page, int size, Payment.Status status) {
+        Page<Payment> payments = paymentRepository.findByStatus(PageRequest.of(page, size), status);
+        if (payments.isEmpty()) {
+            throw new NotFoundException("Nenhum pagamento registrado.");
+        }
+        return payments.map(PaymentDTO::new);
+    }
+
+    public Page<PaymentDTO> getPaymentByPaymentMethod(int page, int size, String paymentMethod) {
+        Page<Payment> payments = paymentRepository.findByPaymentMethod(PageRequest.of(page, size), paymentMethod);
+        if (payments.isEmpty()) {
+            throw new NotFoundException("Nenhum pagamento registrado.");
+        }
+        return payments.map(PaymentDTO::new);
+    }
+
     public Payment savePayment(CreatePaymentsRequest request) {
         Payment payment = new Payment();
         payment.setOrderId(request.getOrderId());
@@ -54,25 +70,24 @@ public class PaymentService {
         return new PaymentDTO(payment);
     }
 
-    public PaymentDTO getPaymentByStatus(Payment.Status status) {
-        Payment payment = paymentRepository.findByStatus(status).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com Status: " + status));
-        return new PaymentDTO(payment);
-    }
-
-    public PaymentDTO getPaymentByPaymentMethod(String paymentMethod) {
-        Payment payment = paymentRepository.findByPaymentMethod(paymentMethod).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com Método de Pagamento: " + paymentMethod));
-        return new PaymentDTO(payment);
-    }
-
     public Payment updatePayment(Long id, UpdatePaymentsRequest updatedPayment) {
         Payment existingPayment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com ID: " + id));
 
-        existingPayment.setOrderId(updatedPayment.getOrderId());
-        existingPayment.setTransactionId(updatedPayment.getTransactionId());
-        existingPayment.setPaymentDate(updatedPayment.getPaymentDate());
-        existingPayment.setStatus(Payment.Status.valueOf(updatedPayment.getStatus().name()));
-        existingPayment.setAmount(updatedPayment.getAmount());
-        existingPayment.setPaymentMethod(updatedPayment.getPaymentMethod());
+        if (updatedPayment.getOrderId() != null) {
+            existingPayment.setOrderId(updatedPayment.getOrderId());
+        }
+        if (updatedPayment.getStatus() != null) {
+            existingPayment.setStatus(updatedPayment.getStatus()); // Sem usar o .name()
+        }
+        if (updatedPayment.getPaymentDate() != null) {
+            existingPayment.setPaymentDate(updatedPayment.getPaymentDate());
+        }
+        if (updatedPayment.getAmount() != null) {
+            existingPayment.setAmount(updatedPayment.getAmount());
+        }
+        if (updatedPayment.getPaymentMethod() != null) {
+            existingPayment.setPaymentMethod(updatedPayment.getPaymentMethod());
+        }
 
         return paymentRepository.save(existingPayment);
     }
