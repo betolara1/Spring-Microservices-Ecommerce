@@ -19,6 +19,7 @@ public class RabbitMQConfig {
     private static final String PAYMENT_ERROR_QUEUE = "payment.error";
     private static final String PAYMENT_CANCEL_QUEUE = "payment.cancel";
     private static final String PAYMENT_PROCESSING_QUEUE = "payment.processing";
+    private static final String PAYMENT_REFUND_QUEUE = "payment.refund";
 
     private static final String INVENTORY_RESERVED_QUEUE = "inventory.reserved";
     private static final String INVENTORY_OUT_OF_STOCK_QUEUE = "inventory.outOfStock";
@@ -44,6 +45,11 @@ public class RabbitMQConfig {
     @Bean
     public Queue paymentProcessingQueue() {
         return new Queue(PAYMENT_PROCESSING_QUEUE);
+    }
+
+    @Bean
+    public Queue paymentRefundQueue() {
+        return new Queue(PAYMENT_REFUND_QUEUE);
     }
 
     @Bean
@@ -92,6 +98,12 @@ public class RabbitMQConfig {
     public Binding bindingProcessing(Queue paymentProcessingQueue, TopicExchange ecommerceExchange) {
         return BindingBuilder.bind(paymentProcessingQueue).to(ecommerceExchange).with("payment.processing");
     }
+
+    @Bean
+    public Binding bindingRefund(Queue paymentRefundQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(paymentRefundQueue).to(ecommerceExchange).with("payment.refund");
+    }
+
     @Bean
     public Binding bindingInventoryReserved(Queue inventoryReservedQueue, TopicExchange ecommerceExchange) {
         return BindingBuilder.bind(inventoryReservedQueue).to(ecommerceExchange).with("inventory.reserved");

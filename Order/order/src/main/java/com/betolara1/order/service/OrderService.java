@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.betolara1.order.dto.request.SaveOrderRequest;
 import com.betolara1.order.dto.request.UpdateOrderRequest;
-import com.betolara1.order.dto.response.InventoryEvent;
 import com.betolara1.order.dto.response.OrderDTO;
 import com.betolara1.order.dto.response.PaymentEvent;
 import com.betolara1.order.exception.NotFoundException;
@@ -96,10 +95,12 @@ public class OrderService {
         orderRepository.delete(finOrder);
     }
 
-    public void updateStatus(Long id, Order.Status status) {
+    // Método para atualizar o status do pedido
+    // Usado pelo OrderListener para atualizar o status do pedido
+    public Order updateStatus(Long id, Order.Status status) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Pedido não encontrado com ID: " + id));
         order.setStatus(status);
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
     // Método para salvar o pedido e enviar para o rabbitMQ
@@ -118,11 +119,9 @@ public class OrderService {
 
         // 2. Cria o objeto ("A Carta") que vai enviar. (Usa um DTO simplificado, não a Entidade)
         PaymentEvent event = new PaymentEvent(order.getId(), order.getTotalAmount());
-        InventoryEvent inventoryEvent = new InventoryEvent(order.getId(), order.getSku(), order.getQuantity(), order.getStatus().name());
 
         // 3. Joga no Correio (Nome da Exchange, Etiqueta, O Pacote JSON)
         rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.created", event);
-        rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.created", inventoryEvent);
 
         return order;
     }

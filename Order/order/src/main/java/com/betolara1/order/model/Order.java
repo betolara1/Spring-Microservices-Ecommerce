@@ -40,8 +40,10 @@ public class Order {
         DELIVERED,
         CANCELLED,
         PAID,
+        APPROVED,
         FAILED,
         OUT_OF_STOCK,
-        RESERVED
+        RESERVED,
+        REFUND
     }
 }

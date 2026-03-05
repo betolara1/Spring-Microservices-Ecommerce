@@ -39,6 +39,6 @@ public class Payment {
         PENDING,
         COMPLETED,
         FAILED,
-        REFUNDED
+        REFUND
     }
 }

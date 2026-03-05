@@ -60,4 +60,10 @@ public class PaymentListener {
             rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.error", paymentErrorEvent);
         }
     }
+
+    @RabbitListener(queues = "payment.refund")
+    public void onPaymentRefund(PaymentEvent event) {
+        System.out.println("❌ [Payment Service] Reembolsando pagamento para o Pedido: " + event.orderId());
+        paymentService.updateStatus(event.orderId(), Payment.Status.REFUND);
+    }
 }

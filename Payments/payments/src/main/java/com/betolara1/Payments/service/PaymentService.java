@@ -13,6 +13,7 @@ import com.betolara1.payments.dto.request.UpdatePaymentsRequest;
 import com.betolara1.payments.dto.response.PaymentDTO;
 import com.betolara1.payments.exception.NotFoundException;
 import com.betolara1.payments.model.Payment;
+import com.betolara1.payments.model.Payment.Status;
 import com.betolara1.payments.repository.PaymentRepository;
 
 @Service
@@ -112,6 +113,12 @@ public class PaymentService {
         payment.setStatus(Payment.Status.valueOf(request.getStatus().name()));
         payment.setAmount(request.getAmount());
         payment.setPaymentMethod(request.getPaymentMethod());
+        return paymentRepository.save(payment);
+    }
+
+    public Payment updateStatus(Long orderId, Status refund) {
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com ID: " + orderId));
+        payment.setStatus(refund);
         return paymentRepository.save(payment);
     }
 }
