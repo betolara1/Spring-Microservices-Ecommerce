@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.betolara1.order.dto.request.SaveOrderRequest;
 import com.betolara1.order.dto.request.UpdateOrderRequest;
+import com.betolara1.order.dto.response.InventoryEvent;
 import com.betolara1.order.dto.response.OrderDTO;
 import com.betolara1.order.dto.response.PaymentEvent;
 import com.betolara1.order.exception.NotFoundException;
@@ -109,15 +110,19 @@ public class OrderService {
         order.setStatus(request.getStatus());
         order.setTotalAmount(request.getTotalAmount());
         order.setShippingAddress(request.getShippingAddress());
+        order.setSku(request.getSku());
+        order.setQuantity(request.getQuantity());
 
         order.setStatus(Order.Status.PENDING); // Ainda não pagou
         order = orderRepository.save(order); // update object with generated ID
 
         // 2. Cria o objeto ("A Carta") que vai enviar. (Usa um DTO simplificado, não a Entidade)
         PaymentEvent event = new PaymentEvent(order.getId(), order.getTotalAmount());
+        InventoryEvent inventoryEvent = new InventoryEvent(order.getId(), order.getSku(), order.getQuantity(), order.getStatus().name());
 
         // 3. Joga no Correio (Nome da Exchange, Etiqueta, O Pacote JSON)
         rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.created", event);
+        rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.created", inventoryEvent);
 
         return order;
     }

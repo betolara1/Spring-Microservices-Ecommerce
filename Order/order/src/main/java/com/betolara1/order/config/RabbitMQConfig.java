@@ -20,6 +20,11 @@ public class RabbitMQConfig {
     private static final String PAYMENT_CANCEL_QUEUE = "payment.cancel";
     private static final String PAYMENT_PROCESSING_QUEUE = "payment.processing";
 
+    private static final String INVENTORY_RESERVED_QUEUE = "inventory.reserved";
+    private static final String INVENTORY_OUT_OF_STOCK_QUEUE = "inventory.outOfStock";
+    private static final String INVENTORY_AVAILABLE_QUEUE = "inventory.available";
+    private static final String INVENTORY_ERROR_QUEUE = "inventory.error";
+
     // 2. A Fila (A caixa de correio do Payments)
     @Bean
     public Queue paymentOkQueue() {
@@ -39,6 +44,26 @@ public class RabbitMQConfig {
     @Bean
     public Queue paymentProcessingQueue() {
         return new Queue(PAYMENT_PROCESSING_QUEUE);
+    }
+
+    @Bean
+    public Queue inventoryReservedQueue() {
+        return new Queue(INVENTORY_RESERVED_QUEUE);
+    }
+
+    @Bean
+    public Queue inventoryOutOfStockQueue() {
+        return new Queue(INVENTORY_OUT_OF_STOCK_QUEUE);
+    }
+
+    @Bean
+    public Queue inventoryAvailableQueue() {
+        return new Queue(INVENTORY_AVAILABLE_QUEUE);
+    }
+
+    @Bean
+    public Queue inventoryErrorQueue() {
+        return new Queue(INVENTORY_ERROR_QUEUE);
     }
 
     // 3. A Exchange (A agência dos Correios)
@@ -66,6 +91,25 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingProcessing(Queue paymentProcessingQueue, TopicExchange ecommerceExchange) {
         return BindingBuilder.bind(paymentProcessingQueue).to(ecommerceExchange).with("payment.processing");
+    }
+    @Bean
+    public Binding bindingInventoryReserved(Queue inventoryReservedQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(inventoryReservedQueue).to(ecommerceExchange).with("inventory.reserved");
+    }
+
+    @Bean
+    public Binding bindingInventoryOutOfStock(Queue inventoryOutOfStockQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(inventoryOutOfStockQueue).to(ecommerceExchange).with("inventory.outOfStock");
+    }
+
+    @Bean
+    public Binding bindingInventoryAvailable(Queue inventoryAvailableQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(inventoryAvailableQueue).to(ecommerceExchange).with("inventory.available");
+    }
+
+    @Bean
+    public Binding bindingInventoryError(Queue inventoryErrorQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(inventoryErrorQueue).to(ecommerceExchange).with("inventory.error");
     }
 
     // Converte Java Objects para JSON quando manda pra fila

@@ -27,4 +27,10 @@ public class SaveOrderRequest {
 
     @NotBlank(message = "Shipping address is required")
     private String shippingAddress;
+
+    @NotBlank(message = "SKU is required")
+    private String sku;
+
+    @NotNull(message = "Quantity is required")
+    private Integer quantity;
 }

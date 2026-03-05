@@ -48,17 +48,6 @@ public class PaymentService {
         return payments.map(PaymentDTO::new);
     }
 
-    public Payment savePayment(CreatePaymentsRequest request) {
-        Payment payment = new Payment();
-        payment.setOrderId(request.getOrderId());
-        payment.setTransactionId(request.getTransactionId());
-        payment.setPaymentDate(request.getPaymentDate());
-        payment.setStatus(Payment.Status.valueOf(request.getStatus().name()));
-        payment.setAmount(request.getAmount());
-        payment.setPaymentMethod(request.getPaymentMethod());
-        return paymentRepository.save(payment);
-    }
-
     public PaymentDTO getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com ID: " + id));
         return new PaymentDTO(payment);
@@ -101,32 +90,28 @@ public class PaymentService {
         paymentRepository.delete(payment);
     }
 
-    // Método para processar o pagamento no rabbitMQ (Mock) 
-    public Payment processPayment(Long orderId, BigDecimal amount) {
+    public Payment savePayment(CreatePaymentsRequest request) {
 
         // CONDIÇÃO APENAS PARA TESTAR O PAGAMENTO RECUSADO
-        if (amount.compareTo(new BigDecimal("1000")) > 0) {
+        if (request.getAmount().compareTo(new BigDecimal("1000")) > 0) {
             Payment payment = new Payment();
-            payment.setOrderId(orderId);
-            payment.setAmount(amount);
+            payment.setOrderId(request.getOrderId());
+            payment.setAmount(request.getAmount());
             payment.setStatus(Payment.Status.FAILED);
             payment.setTransactionId(UUID.randomUUID().toString());
             payment.setPaymentDate(LocalDateTime.now());
             payment.setCreatedAt(LocalDateTime.now());
-            payment.setPaymentMethod("CREDIT_CARD");
+            payment.setPaymentMethod(request.getPaymentMethod());
             return paymentRepository.save(payment);
         }
 
         Payment payment = new Payment();
-        payment.setOrderId(orderId);
-        payment.setAmount(amount);
-        payment.setStatus(Payment.Status.COMPLETED); // Simulado como aprovado
-        payment.setTransactionId(UUID.randomUUID().toString());
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setCreatedAt(LocalDateTime.now());
-        payment.setUpdatedAt(LocalDateTime.now());
-        payment.setPaymentMethod("CREDIT_CARD"); // Exemplo fixo
-
+        payment.setOrderId(request.getOrderId());
+        payment.setTransactionId(request.getTransactionId());
+        payment.setPaymentDate(request.getPaymentDate());
+        payment.setStatus(Payment.Status.valueOf(request.getStatus().name()));
+        payment.setAmount(request.getAmount());
+        payment.setPaymentMethod(request.getPaymentMethod());
         return paymentRepository.save(payment);
     }
 }

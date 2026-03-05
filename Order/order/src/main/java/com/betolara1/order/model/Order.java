@@ -27,6 +27,8 @@ public class Order {
     private BigDecimal totalAmount;
     
     private String shippingAddress;
+    private String sku;
+    private Integer quantity;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -38,6 +40,8 @@ public class Order {
         DELIVERED,
         CANCELLED,
         PAID,
-        FAILED
+        FAILED,
+        OUT_OF_STOCK,
+        RESERVED
     }
 }

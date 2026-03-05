@@ -15,6 +15,8 @@ public class OrderDTO {
     private Order.Status status;
     private BigDecimal totalAmount;
     private String shippingAddress;
+    private String sku;
+    private Integer quantity;
 
     public OrderDTO(){}
 
@@ -25,5 +27,7 @@ public class OrderDTO {
         this.status = order.getStatus();
         this.totalAmount = order.getTotalAmount();
         this.shippingAddress = order.getShippingAddress();
+        this.sku = order.getSku();
+        this.quantity = order.getQuantity();
     }
 }

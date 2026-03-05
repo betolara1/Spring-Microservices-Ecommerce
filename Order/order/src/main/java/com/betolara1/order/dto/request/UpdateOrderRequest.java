@@ -18,4 +18,7 @@ public class UpdateOrderRequest {
     private BigDecimal totalAmount;
 
     private String shippingAddress;
+    private String sku;
+    private Integer quantity;
+
 }

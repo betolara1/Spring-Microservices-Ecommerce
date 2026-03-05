@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+import com.betolara1.payments.dto.request.CreatePaymentsRequest;
 import com.betolara1.payments.dto.response.PaymentEvent;
 import com.betolara1.payments.model.Payment;
 
@@ -28,14 +29,16 @@ public class PaymentListener {
             // 1. Envia mensagem para o rabbitMQ dizendo que o pagamento está sendo processado
             rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.processing", new PaymentEvent(event.orderId(), event.totalPrice()));
 
-
-
             // 2. Aqui você simula o processamento do pagamento.
             // Exemplo: Salvar o pagamento no banco de dados do microsserviço Payments
             // OBS: Verifique o que o seu paymentService precisa para criar um pagamento!
             
-            Payment processedPayment = paymentService.processPayment(event.orderId(), event.totalPrice());
+            CreatePaymentsRequest savePayment = new CreatePaymentsRequest();
+            savePayment.setOrderId(event.orderId());
+            savePayment.setAmount(event.totalPrice());
             System.out.println("✅ Pagamento aprovado com sucesso para o Pedido: " + event.orderId());
+
+            Payment processedPayment = paymentService.savePayment(savePayment);
 
 
             // 3. (PRÓXIMO PASSO) Enviar uma nova mensagem para o RabbitMQ dizendo: "Pagamento Aprovado!"
