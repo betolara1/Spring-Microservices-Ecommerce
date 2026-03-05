@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     // 1. A Chave de Roteamento (A "Etiqueta" do pacote)
+    // Chaves que recebe do order (se foi criado)
     private static final String PAYMENT_CREATED_QUEUE = "payment.created";
 
     // 2. A Fila (A caixa de correio do Payments)

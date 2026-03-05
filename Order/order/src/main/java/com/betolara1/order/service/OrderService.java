@@ -64,26 +64,6 @@ public class OrderService {
         return orders.map(OrderDTO::new);
     }
 
-    public Order saveOrder(SaveOrderRequest request){
-        Order order = new Order();
-        order.setCustomerId(request.getCustomerId());
-        order.setOrderDate(request.getOrderDate());
-        order.setStatus(request.getStatus());
-        order.setTotalAmount(request.getTotalAmount());
-        order.setShippingAddress(request.getShippingAddress());
-
-        order.setStatus(Order.Status.PENDING); // Ainda não pagou
-        order = orderRepository.save(order); // update object with generated ID
-
-        // 2. Cria o objeto ("A Carta") que vai enviar. (Usa um DTO simplificado, não a Entidade)
-        PaymentEvent event = new PaymentEvent(order.getId(), order.getTotalAmount());
-
-        // 3. Joga no Correio (Nome da Exchange, Etiqueta, O Pacote JSON)
-        rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.created", event);
-
-        return order;
-    }
-
     public OrderDTO getOrderById(Long id){
         Order order = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Pedido não encontrado com ID: " + id));
         return new OrderDTO(order);
@@ -119,6 +99,27 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Pedido não encontrado com ID: " + id));
         order.setStatus(status);
         orderRepository.save(order);
+    }
+
+    // Método para salvar o pedido e enviar para o rabbitMQ
+    public Order saveOrder(SaveOrderRequest request){
+        Order order = new Order();
+        order.setCustomerId(request.getCustomerId());
+        order.setOrderDate(request.getOrderDate());
+        order.setStatus(request.getStatus());
+        order.setTotalAmount(request.getTotalAmount());
+        order.setShippingAddress(request.getShippingAddress());
+
+        order.setStatus(Order.Status.PENDING); // Ainda não pagou
+        order = orderRepository.save(order); // update object with generated ID
+
+        // 2. Cria o objeto ("A Carta") que vai enviar. (Usa um DTO simplificado, não a Entidade)
+        PaymentEvent event = new PaymentEvent(order.getId(), order.getTotalAmount());
+
+        // 3. Joga no Correio (Nome da Exchange, Etiqueta, O Pacote JSON)
+        rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.created", event);
+
+        return order;
     }
 
 }

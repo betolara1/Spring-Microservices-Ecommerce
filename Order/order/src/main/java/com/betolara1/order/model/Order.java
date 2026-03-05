@@ -40,8 +40,4 @@ public class Order {
         PAID,
         FAILED
     }
-
-    public BigDecimal getTotalPrice() {
-        return null;
-    }
 }

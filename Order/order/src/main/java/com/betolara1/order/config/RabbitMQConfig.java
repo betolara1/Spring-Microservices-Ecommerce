@@ -14,8 +14,11 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     // 1. A Chave de Roteamento (A "Etiqueta" do pacote)
+    // Chaves que recebe do payments (retorna se esta ok ou deu erro ou cancelou)
     private static final String PAYMENT_OK_QUEUE = "payment.ok";
     private static final String PAYMENT_ERROR_QUEUE = "payment.error";
+    private static final String PAYMENT_CANCEL_QUEUE = "payment.cancel";
+    private static final String PAYMENT_PROCESSING_QUEUE = "payment.processing";
 
     // 2. A Fila (A caixa de correio do Payments)
     @Bean
@@ -26,6 +29,16 @@ public class RabbitMQConfig {
     @Bean
     public Queue paymentErrorQueue() {
         return new Queue(PAYMENT_ERROR_QUEUE);
+    }
+
+    @Bean
+    public Queue paymentCancelQueue() {
+        return new Queue(PAYMENT_CANCEL_QUEUE);
+    }
+
+    @Bean
+    public Queue paymentProcessingQueue() {
+        return new Queue(PAYMENT_PROCESSING_QUEUE);
     }
 
     // 3. A Exchange (A agência dos Correios)
@@ -43,6 +56,16 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingError(Queue paymentErrorQueue, TopicExchange ecommerceExchange) {
         return BindingBuilder.bind(paymentErrorQueue).to(ecommerceExchange).with("payment.error");
+    }
+
+    @Bean
+    public Binding bindingCancel(Queue paymentCancelQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(paymentCancelQueue).to(ecommerceExchange).with("payment.cancel");
+    }
+
+    @Bean
+    public Binding bindingProcessing(Queue paymentProcessingQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(paymentProcessingQueue).to(ecommerceExchange).with("payment.processing");
     }
 
     // Converte Java Objects para JSON quando manda pra fila

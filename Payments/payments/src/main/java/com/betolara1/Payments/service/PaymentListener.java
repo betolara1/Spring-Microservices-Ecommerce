@@ -25,25 +25,36 @@ public class PaymentListener {
         System.out.println("💰 Valor a ser cobrado: R$ " + event.totalPrice());
 
         try {
+            // 1. Envia mensagem para o rabbitMQ dizendo que o pagamento está sendo processado
+            rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.processing", new PaymentEvent(event.orderId(), event.totalPrice()));
+
+
+
             // 2. Aqui você simula o processamento do pagamento.
             // Exemplo: Salvar o pagamento no banco de dados do microsserviço Payments
             // OBS: Verifique o que o seu paymentService precisa para criar um pagamento!
+            
             Payment processedPayment = paymentService.processPayment(event.orderId(), event.totalPrice());
-
             System.out.println("✅ Pagamento aprovado com sucesso para o Pedido: " + event.orderId());
+
 
             // 3. (PRÓXIMO PASSO) Enviar uma nova mensagem para o RabbitMQ dizendo: "Pagamento Aprovado!"
             // Assim o Order pode escutar essa nova mensagem e atualizar o status para PAID.
-            if (processedPayment != null) {
+
+            if (processedPayment.getStatus() == Payment.Status.COMPLETED) {
                 PaymentEvent paymentApprovedEvent = new PaymentEvent(event.orderId(), event.totalPrice());
                 rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.ok", paymentApprovedEvent);
             } else {
                 PaymentEvent paymentErrorEvent = new PaymentEvent(event.orderId(), event.totalPrice());
-                rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.error", paymentErrorEvent);
+                rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.cancel", paymentErrorEvent);
             }
 
         } catch (Exception e) {
             System.out.println("❌ Erro ao processar pagamento do Pedido: " + event.orderId());
+
+            // IMPORTANTE: Avisa o Order que falhou!
+            PaymentEvent paymentErrorEvent = new PaymentEvent(event.orderId(), event.totalPrice());
+            rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.error", paymentErrorEvent);
         }
     }
 }

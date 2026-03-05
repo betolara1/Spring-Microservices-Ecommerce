@@ -101,7 +101,22 @@ public class PaymentService {
         paymentRepository.delete(payment);
     }
 
+    // Método para processar o pagamento no rabbitMQ (Mock) 
     public Payment processPayment(Long orderId, BigDecimal amount) {
+
+        // CONDIÇÃO APENAS PARA TESTAR O PAGAMENTO RECUSADO
+        if (amount.compareTo(new BigDecimal("1000")) > 0) {
+            Payment payment = new Payment();
+            payment.setOrderId(orderId);
+            payment.setAmount(amount);
+            payment.setStatus(Payment.Status.FAILED);
+            payment.setTransactionId(UUID.randomUUID().toString());
+            payment.setPaymentDate(LocalDateTime.now());
+            payment.setCreatedAt(LocalDateTime.now());
+            payment.setPaymentMethod("CREDIT_CARD");
+            return paymentRepository.save(payment);
+        }
+
         Payment payment = new Payment();
         payment.setOrderId(orderId);
         payment.setAmount(amount);
