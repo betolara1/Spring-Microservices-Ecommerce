@@ -1,23 +1,28 @@
 package com.betolara1.product.service;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.betolara1.product.dto.request.CreateProductRequest;
 import com.betolara1.product.dto.request.UpdateProductRequest;
 import com.betolara1.product.dto.response.ProductDTO;
+import com.betolara1.product.dto.response.ProductEvent;
 import com.betolara1.product.exception.NotFoundException;
 import com.betolara1.product.model.Product;
 import com.betolara1.product.repository.ProductRepository;
 
 @Service
-@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final RabbitTemplate rabbitTemplate;
+    public ProductService(ProductRepository productRepository, RabbitTemplate rabbitTemplate){
+        this.productRepository = productRepository;
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     public Page<ProductDTO> getAllProducts(int page, int size) {
         Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
@@ -27,18 +32,6 @@ public class ProductService {
         }
         
         return products.map(ProductDTO::new);
-    }
-
-    public Product saveProduct(CreateProductRequest request) {
-        Product product = new Product();
-        product.setSku(request.getSku());
-        product.setName(request.getName());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setCategoryId(request.getCategoryId());
-        product.setImageUrl(request.getImageUrl());
-        product.setActive(request.isActive());
-        return productRepository.save(product);
     }
 
     public ProductDTO getProductById(Long id) {
@@ -83,5 +76,23 @@ public class ProductService {
     public void deleteProduct(Long id){
         Product findProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID: " + id));
         productRepository.delete(findProduct);
+    }
+
+    public Product saveProduct(CreateProductRequest request) {
+        Product product = new Product();
+        product.setSku(request.getSku());
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setCategoryId(request.getCategoryId());
+        product.setImageUrl(request.getImageUrl());
+        product.setActive(request.isActive());
+        product = productRepository.save(product);
+
+        ProductEvent event = new ProductEvent(product.getId(), product.getSku(), product.getName(), product.getPrice());
+
+        rabbitTemplate.convertAndSend("ecommerce.exchange", "product.created", event);
+
+        return product;
     }
 }

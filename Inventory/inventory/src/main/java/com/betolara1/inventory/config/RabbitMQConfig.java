@@ -16,11 +16,17 @@ public class RabbitMQConfig {
     // 1. A Chave de Roteamento (A "Etiqueta" do pacote)
     // Chaves que recebe do order (retorna se esta ok ou deu erro ou cancelou)
     private static final String INVENTORY_CREATED_QUEUE = "inventory.created";
+    private static final String PRODUCT_CREATED_QUEUE = "product.created";
 
     // 2. A Fila (A caixa de correio do order)
     @Bean
     public Queue inventoryReservedQueue() {
         return new Queue(INVENTORY_CREATED_QUEUE);
+    }
+
+    @Bean
+    public Queue productCreatedQueue() {
+        return new Queue(PRODUCT_CREATED_QUEUE);
     }
 
     // 3. A Exchange (A agência dos Correios)
@@ -33,6 +39,11 @@ public class RabbitMQConfig {
     @Bean
     public Binding bindingInventoryCreated(Queue inventoryReservedQueue, TopicExchange ecommerceExchange) {
         return BindingBuilder.bind(inventoryReservedQueue).to(ecommerceExchange).with("inventory.created");
+    }
+
+    @Bean
+    public Binding bindingProductCreated(Queue productCreatedQueue, TopicExchange ecommerceExchange) {
+        return BindingBuilder.bind(productCreatedQueue).to(ecommerceExchange).with("product.created");
     }
 
     // Converte Java Objects para JSON quando manda pra fila

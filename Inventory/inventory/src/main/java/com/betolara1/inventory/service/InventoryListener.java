@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.betolara1.inventory.model.Inventory;
 import com.betolara1.inventory.dto.request.SaveInventoryRequest;
 import com.betolara1.inventory.dto.response.InventoryEvent;
+import com.betolara1.inventory.dto.response.ProductEvent;
 
 @Component
 public class InventoryListener {
@@ -54,6 +55,23 @@ public class InventoryListener {
             System.out.println("❌ Erro ao reservar estoque do Pedido: " + event.orderId());
             InventoryEvent inventoryErrorEvent = new InventoryEvent(event.orderId(), event.sku(), event.quantity(), event.status());
             rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.error", inventoryErrorEvent);
+        }
+    }
+
+    @RabbitListener(queues = "product.created")
+    public void onProductCreated(ProductEvent event) {
+        System.out.println("✅ [Product Service] Produto criado: " + event.name());
+
+        try{
+            SaveInventoryRequest request = new SaveInventoryRequest();
+            request.setSku(event.sku());
+            request.setQuantity(0);
+
+            inventoryService.saveInventory(request);
+            System.out.println("✅ Registro de estoque criado com sucesso para o SKU: " + event.sku());
+            
+        }catch (Exception e){
+            System.out.println("❌ [Inventory Service] Erro ao criar estoque: " + e.getMessage());
         }
     }
 }

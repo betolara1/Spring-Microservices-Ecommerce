@@ -82,6 +82,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Jackson2JsonMessageConverter -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 		<!-- OpenFeign -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
