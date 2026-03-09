@@ -1,4 +1,4 @@
-package com.betolara1.user.DTO.response;
+package com.betolara1.user.dto.response;
 
 import com.betolara1.user.model.User;
 

@@ -1,9 +1,5 @@
 package com.betolara1.payments.service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-import java.math.BigDecimal;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -15,6 +11,8 @@ import com.betolara1.payments.exception.NotFoundException;
 import com.betolara1.payments.model.Payment;
 import com.betolara1.payments.model.Payment.Status;
 import com.betolara1.payments.repository.PaymentRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class PaymentService {
@@ -66,18 +64,6 @@ public class PaymentService {
 
     @Transactional
     public Payment savePayment(CreatePaymentsRequest request) {
-        // CONDIÇÃO APENAS PARA TESTAR O PAGAMENTO RECUSADO
-        if (request.getAmount().compareTo(new BigDecimal("1000")) > 0) {
-            Payment payment = new Payment();
-            payment.setOrderId(request.getOrderId());
-            payment.setAmount(request.getAmount());
-            payment.setStatus(Payment.Status.FAILED);
-            payment.setTransactionId(UUID.randomUUID().toString());
-            payment.setPaymentDate(LocalDateTime.now());
-            payment.setPaymentMethod(request.getPaymentMethod());
-            return paymentRepository.save(payment);
-        }
-
         Payment payment = new Payment();
         payment.setOrderId(request.getOrderId());
         payment.setTransactionId(request.getTransactionId());

@@ -3,7 +3,7 @@ package com.betolara1.user.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.betolara1.user.DTO.response.StandardErrorDTO;
+import com.betolara1.user.dto.response.StandardErrorDTO;
 
 import lombok.Getter;
 

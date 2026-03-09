@@ -11,6 +11,8 @@ import com.betolara1.inventory.exception.NotFoundException;
 import com.betolara1.inventory.model.Inventory;
 import com.betolara1.inventory.repository.InventoryRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class InventoryService {
 

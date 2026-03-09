@@ -5,7 +5,6 @@ import java.time.LocalDate;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import com.betolara1.order.client.UserClient;
-import com.betolara1.order.client.UserDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,8 @@ import com.betolara1.order.dto.response.PaymentEvent;
 import com.betolara1.order.exception.NotFoundException;
 import com.betolara1.order.model.Order;
 import com.betolara1.order.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderService {
@@ -78,8 +79,7 @@ public class OrderService {
     @Transactional
     public Order saveOrder(SaveOrderRequest request) {
         // 1. Validação síncrona do Cliente via Feign
-        UserDTO user = userClient.getUserById(request.getCustomerId());
-        System.out.println("👤 Cliente Validado: " + user.getName());
+        userClient.getUserById(request.getCustomerId());
 
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());

@@ -14,6 +14,8 @@ import com.betolara1.product.exception.NotFoundException;
 import com.betolara1.product.model.Product;
 import com.betolara1.product.repository.ProductRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ProductService {
 

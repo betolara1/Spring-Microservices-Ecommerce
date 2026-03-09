@@ -1,4 +1,4 @@
-package com.betolara1.user.DTO.request;
+package com.betolara1.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

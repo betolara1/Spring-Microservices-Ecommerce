@@ -24,10 +24,6 @@ public class PaymentListener {
     // 1. Ouve a fila "payment.created" (Enviada pelo Order)
     @RabbitListener(queues = "payment.created")
     public void onPaymentCreated(PaymentEvent event) {
-
-        System.out.println("💳 [Payment Service] Requisição de pagamento recebida para o Pedido ID: " + event.orderId());
-        System.out.println("💰 Valor a ser cobrado: R$ " + event.totalPrice());
-
         try {
             // 1. Envia mensagem para o rabbitMQ dizendo que o pagamento está sendo processado
             rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.processing", new PaymentEvent(event.orderId(), event.totalPrice()));
@@ -43,7 +39,6 @@ public class PaymentListener {
             savePayment.setPaymentMethod("CREDIT_CARD");
             savePayment.setTransactionId(UUID.randomUUID().toString());
             savePayment.setPaymentDate(LocalDateTime.now());
-            System.out.println("✅ Pagamento aprovado com sucesso para o Pedido: " + event.orderId());
 
             Payment processedPayment = paymentService.savePayment(savePayment);
 
@@ -60,8 +55,6 @@ public class PaymentListener {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ Erro ao processar pagamento do Pedido: " + event.orderId());
-
             // IMPORTANTE: Avisa o Order que falhou!
             PaymentEvent paymentErrorEvent = new PaymentEvent(event.orderId(), event.totalPrice());
             rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.error", paymentErrorEvent);
@@ -70,7 +63,6 @@ public class PaymentListener {
 
     @RabbitListener(queues = "payment.refund")
     public void onPaymentRefund(PaymentEvent event) {
-        System.out.println("❌ [Payment Service] Reembolsando pagamento para o Pedido: " + event.orderId());
         paymentService.updateStatus(event.orderId(), Payment.Status.REFUND);
     }
 }

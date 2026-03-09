@@ -2,7 +2,6 @@ package com.betolara1.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -70,9 +69,9 @@ public class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        Optional<User> foundUser = userService.findById(1L);
+        User foundUser = userService.findById(1L);
 
-        assertTrue(foundUser.isPresent());
-        assertEquals(user, foundUser.get());
+        assertThat(foundUser).isNotNull();
+        assertEquals(user, foundUser);
     }
 }

@@ -22,9 +22,6 @@ public class InventoryListener {
     // Método para ouvir o rabbitMQ e atualizar o status do pedido
     @RabbitListener(queues = "inventory.created")
     public void onInventoryCreated(InventoryEvent event) {
-        System.out.println("💳 [Inventory Service] Requisição de estoque recebida para o Pedido ID: " + event.orderId());
-        System.out.println("💰 Quantidade a ser reservada: " + event.quantity());
-
         try{
             // 1. Envia mensagem para o rabbitMQ dizendo que o estoque está sendo reservado
             //rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.reserved", new InventoryEvent(event.orderId(), event.sku(), event.quantity(), event.status()));
@@ -38,7 +35,6 @@ public class InventoryListener {
             saveRequest.setQuantity(event.quantity());
 
             Inventory reservedInventory = inventoryService.saveInventory(saveRequest);
-            System.out.println("✅ Estoque reservado com sucesso para o Pedido: " + event.orderId());
 
             // 3. (PRÓXIMO PASSO) Enviar uma nova mensagem para o RabbitMQ dizendo: "Estoque Reservado!"
             // Assim o Order pode escutar essa nova mensagem e atualizar o status para RESERVED.
@@ -52,7 +48,6 @@ public class InventoryListener {
             }
 
         }catch (Exception e){
-            System.out.println("❌ Erro ao reservar estoque do Pedido: " + event.orderId());
             InventoryEvent inventoryErrorEvent = new InventoryEvent(event.orderId(), event.sku(), event.quantity(), event.status());
             rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.error", inventoryErrorEvent);
         }
@@ -60,7 +55,6 @@ public class InventoryListener {
 
     @RabbitListener(queues = "product.created")
     public void onProductCreated(ProductEvent event) {
-        System.out.println("✅ [Product Service] Produto criado: " + event.name());
 
         try{
             SaveInventoryRequest request = new SaveInventoryRequest();
@@ -68,10 +62,9 @@ public class InventoryListener {
             request.setQuantity(0);
 
             inventoryService.saveInventory(request);
-            System.out.println("✅ Registro de estoque criado com sucesso para o SKU: " + event.sku());
             
         }catch (Exception e){
-            System.out.println("❌ [Inventory Service] Erro ao criar estoque: " + e.getMessage());
+            
         }
     }
 }

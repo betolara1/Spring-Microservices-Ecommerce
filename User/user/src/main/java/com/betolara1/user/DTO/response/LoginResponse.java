@@ -1,4 +1,4 @@
-package com.betolara1.user.DTO.response;
+package com.betolara1.user.dto.response;
 
 // Neste caso, o LoginDTO é usado para retornar os dados de login do usuário, como o token JWT e o username. 
 // Ele é uma forma segura e clara de enviar apenas as informações necessárias para o cliente após o login bem-sucedido.

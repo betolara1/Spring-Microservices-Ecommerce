@@ -6,5 +6,7 @@ CREATE TABLE users (
     name VARCHAR(255),
     email VARCHAR(255),
     phone VARCHAR(255),
-    address VARCHAR(255)
+    address VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );

@@ -6,13 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.betolara1.user.DTO.response.StandardErrorDTO;
-
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.betolara1.user.dto.response.StandardErrorDTO;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,7 +20,8 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE RECURSO NÃO ENCONTRADO (404)
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<StandardErrorDTO> handleRecursoNaoEncontrado(NotFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleRecursoNaoEncontrado(NotFoundException ex,
+            HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),
@@ -64,7 +64,8 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE ERROS DE VALIDAÇÃO (400)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardErrorDTO> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleValidationException(MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
 
         ValidationErrorDTO errorMessages = new ValidationErrorDTO();
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
@@ -83,7 +84,8 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE VIOLAÇÃO DE INTEGRIDADE (409) - Ex: username duplicado
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<StandardErrorDTO> handleDataIntegrityException(DataIntegrityViolationException ex, HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleDataIntegrityException(DataIntegrityViolationException ex,
+            HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),
@@ -97,7 +99,8 @@ public class GlobalHandlerException {
 
     // TRATAMENTO DE RECURSO NÃO ENCONTRADO NO ENDPOINT (404)
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<StandardErrorDTO> handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<StandardErrorDTO> handleNoResourceFoundException(NoResourceFoundException ex,
+            HttpServletRequest request) {
 
         StandardErrorDTO erro = new StandardErrorDTO(
                 LocalDateTime.now(),
@@ -107,6 +110,20 @@ public class GlobalHandlerException {
                 request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    // TRATAMENTO DE RECURSO JÁ EXISTENTE (409)
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<StandardErrorDTO> handleConflict(ConflictException ex, HttpServletRequest request) {
+
+        StandardErrorDTO erro = new StandardErrorDTO(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Conflito",
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 
     // TRATAMENTO GENÉRICO (500)

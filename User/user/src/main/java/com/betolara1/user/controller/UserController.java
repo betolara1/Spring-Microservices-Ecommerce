@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 
-import com.betolara1.user.DTO.response.UserDTO;
 import com.betolara1.user.model.User;
 import com.betolara1.user.service.UserService;
+import com.betolara1.user.dto.response.UserDTO;
 import com.betolara1.user.exception.NotFoundException;
 
 @RestController
@@ -21,15 +21,16 @@ import com.betolara1.user.exception.NotFoundException;
 public class UserController {
 
     private final UserService userService;
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    
+
     @GetMapping("/listAll")
     public ResponseEntity<Page<UserDTO>> listAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        
+
         Page<UserDTO> list = userService.findAllUsers(page, size).map(UserDTO::new);
 
         if (list.isEmpty()) {
@@ -47,12 +48,10 @@ public class UserController {
         // Se for o caso, trata como ID do usuário
         if (identifier.matches("\\d+")) { // Verifica se a string contém apenas dígitos (0-9)
             Long id = Long.parseLong(identifier);
-            user = userService.findById(id)
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado com ID: " + id));
+            user = userService.findById(id);
         } else {
             // Caso contrário, trata como username
-            user = userService.findByUsername(identifier)
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado com username: " + identifier));
+            user = userService.findByUsername(identifier);
         }
 
         return ResponseEntity.ok(new UserDTO(user));
