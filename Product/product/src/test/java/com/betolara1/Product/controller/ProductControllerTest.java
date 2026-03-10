@@ -16,8 +16,9 @@ import com.betolara1.product.model.Product;
 import com.betolara1.product.service.ProductService;
 import com.betolara1.product.controller.ProductController;
 import com.betolara1.product.dto.response.ProductDTO;
+import com.betolara1.product.dto.request.CreateProductRequest;
+import com.betolara1.product.dto.request.UpdateProductRequest;
 import com.betolara1.product.exception.NotFoundException;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 
@@ -74,14 +75,104 @@ public class ProductControllerTest {
             productController.getAllProducts(0, 10);
         });
 
-        // COMANDO PARA VER O MOCKITO NO PROMPT:
-        System.out.println("\n--- DETALHES DO MOCK ---");
-        System.out.println(Mockito.mockingDetails(productService).getInvocations());
-        System.out.println("------------------------\n");
-
         assertTrue(exception.getMessage().contains("Nenhum produto cadastrado"));
     }
 
-    
+    @Test
+    void testGetProductByIdentifier_ById() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setId(1L);
+        when(productService.getProductById(1L)).thenReturn(productDTO);
+
+        ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("1");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+    }
+
+    @Test
+    void testGetProductByIdentifier_ByName() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("Produto Teste");
+        when(productService.getProductByName("Produto Teste")).thenReturn(productDTO);
+
+        ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("Produto Teste");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Produto Teste", response.getBody().getName());
+    }
+
+    @Test
+    void testGetProductByCategoryId() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setCategoryId(1L);
+        when(productService.getProductByCategoryId(1L)).thenReturn(productDTO);
+
+        ResponseEntity<ProductDTO> response = productController.getProductByCategoryId(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getCategoryId());
+    }
+
+    @Test
+    void testGetProductByActive() {
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setActive(true);
+        when(productService.getProductByActive(true)).thenReturn(productDTO);
+
+        ResponseEntity<ProductDTO> response = productController.getProductByActive(true);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isActive());
+    }
+
+    @Test
+    void testCreateProduct() {
+        CreateProductRequest request = new CreateProductRequest();
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Produto Novo");
+
+        when(productService.saveProduct(any(CreateProductRequest.class))).thenReturn(product);
+
+        ResponseEntity<ProductDTO> response = productController.createProduct(request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("Produto Novo", response.getBody().getName());
+    }
+
+    @Test
+    void testUpdateProduct() {
+        UpdateProductRequest request = new UpdateProductRequest();
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Produto Atualizado");
+
+        when(productService.updateProduct(eq(1L), any(UpdateProductRequest.class))).thenReturn(product);
+
+        ResponseEntity<ProductDTO> response = productController.updateProduct(1L, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("Produto Atualizado", response.getBody().getName());
+    }
+
+    @Test
+    void testDeleteProduct() {
+        doNothing().when(productService).deleteProduct(1L);
+
+        ResponseEntity<String> response = productController.deleteProduct(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Produto deletado com sucesso.", response.getBody());
+        verify(productService, times(1)).deleteProduct(1L);
+    }
 
 }

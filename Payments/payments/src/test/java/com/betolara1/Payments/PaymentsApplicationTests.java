@@ -1,4 +1,4 @@
-package com.betolara1.Payments;
+package com.betolara1.payments;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
