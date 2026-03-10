@@ -6,8 +6,3 @@
 
 O Gateway repassa tudo sem verificar tokens. Cada microserviço valida separadamente. Isso funciona, mas idealmente o Gateway seria o ponto central de validação JWT, simplificando os serviços internos.
 
----
-
-
-### 15. Sem Testes Unitários
-Nenhum serviço possui testes JUnit. Isso torna refatorações arriscadas e impede CI/CD confiável.

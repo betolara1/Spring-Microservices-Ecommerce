@@ -101,7 +101,7 @@
 			<version>2.8.5</version>
 		</dependency>
 
-		<!-- JWT Dependencies (anteriormente via JWT-Package, agora direto) -->
+		<!-- JWT Dependencies -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
