@@ -30,18 +30,18 @@ public class InventoryListener {
             // Exemplo: Salvar o estoque no banco de dados do microsserviço Inventory
             // OBS: Verifique o que o seu inventoryService precisa para criar um estoque!
 
-            SaveInventoryRequest saveRequest = new SaveInventoryRequest();
-            saveRequest.setSku(event.sku());
-            saveRequest.setQuantity(event.quantity());
-
-            Inventory reservedInventory = inventoryService.saveInventory(saveRequest);
+            
+            Inventory reservedInventory = inventoryService.findBySkuEntity(event.sku());
 
             // 3. (PRÓXIMO PASSO) Enviar uma nova mensagem para o RabbitMQ dizendo: "Estoque Reservado!"
             // Assim o Order pode escutar essa nova mensagem e atualizar o status para RESERVED.
 
-            if (reservedInventory.getQuantity() > 0) {
+            if (reservedInventory.getQuantity() >= event.quantity()) {
                 InventoryEvent inventoryReservedEvent = new InventoryEvent(event.orderId(), event.sku(), event.quantity(), event.status());
                 rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.reserved", inventoryReservedEvent);
+                
+                reservedInventory.setQuantity(reservedInventory.getQuantity() - event.quantity());
+                inventoryService.updateInventoryEntity(reservedInventory);
             } else {
                 InventoryEvent inventoryErrorEvent = new InventoryEvent(event.orderId(), event.sku(), event.quantity(), event.status());
                 rabbitTemplate.convertAndSend("ecommerce.exchange", "inventory.outOfStock", inventoryErrorEvent);
@@ -60,6 +60,8 @@ public class InventoryListener {
             SaveInventoryRequest request = new SaveInventoryRequest();
             request.setSku(event.sku());
             request.setQuantity(0);
+
+
 
             inventoryService.saveInventory(request);
             

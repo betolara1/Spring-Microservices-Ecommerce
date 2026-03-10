@@ -52,7 +52,7 @@ public class ProductService {
     }
 
     public ProductDTO getProductByActive(boolean active) {
-        Product product = productRepository.findByActive(active).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID da categoria: " + active));
+        Product product = productRepository.findByActive(active).orElseThrow(() -> new NotFoundException("Produto não encontrado com status: " + active));
         return new ProductDTO(product);
     }
 
@@ -73,9 +73,10 @@ public class ProductService {
         product.setActive(request.isActive());
         product = productRepository.save(product);
 
-        ProductEvent event = new ProductEvent(product.getId(), product.getSku(), product.getName(), product.getPrice());
-
-        rabbitTemplate.convertAndSend("ecommerce.exchange", "product.created", event);
+        if (product != null) {
+            ProductEvent event = new ProductEvent(product.getId(), product.getSku(), product.getName(), product.getPrice());
+            rabbitTemplate.convertAndSend("ecommerce.exchange", "product.created", event);
+        }
 
         return product;
     }

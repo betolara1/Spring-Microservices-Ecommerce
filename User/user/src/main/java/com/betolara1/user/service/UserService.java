@@ -81,11 +81,10 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado: " + username));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("Usuário não encontrado: " + username));
 
         // Pega o papel do usuário ou define ROLE_USER se estiver nulo
-        String userRole = user.getRole() != null ? user.getRole() : "ADMIN";
+        String userRole = user.getRole() != null ? user.getRole() : "USER";
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),

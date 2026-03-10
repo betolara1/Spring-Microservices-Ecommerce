@@ -36,9 +36,13 @@ public class InventoryService {
         return new InventoryDTO(inventory);
     }
 
+    public Inventory findBySkuEntity(String sku) {
+        return inventoryRepository.findBySku(sku)
+                .orElseThrow(() -> new NotFoundException("Estoque não encontrado com SKU: " + sku));
+    }
+
     public InventoryDTO getInventoryBySku(String sku){
-        Inventory inventory = inventoryRepository.findBySku(sku).orElseThrow(() -> new NotFoundException("Estoque não encontrado com SKU: " + sku));
-        return new InventoryDTO(inventory);
+        return new InventoryDTO(findBySkuEntity(sku));
     }
 
     @Transactional
@@ -48,9 +52,13 @@ public class InventoryService {
         newInventory.setQuantity(inventory.getQuantity());
         newInventory.setStatus(newInventory.reserved());
 
-        Inventory savedInventory = inventoryRepository.save(newInventory);
+        return inventoryRepository.save(newInventory);
+    }
 
-        return savedInventory;
+    @Transactional
+    public Inventory updateInventoryEntity(Inventory inventory) {
+        inventory.setStatus(inventory.reserved());
+        return inventoryRepository.save(inventory);
     }
 
     @Transactional
