@@ -28,7 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         
         // Pula validação para rotas de login
-        if (path.startsWith("/auth") || path.startsWith("/users/register")) {
+        if (path.startsWith("/auth") || 
+            path.startsWith("/users/register") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/webjars") ||
+            path.startsWith("/actuator") ||
+            path.equals("/error")) {
             try {
                 filterChain.doFilter(request, response);
             } catch (java.io.IOException e) {

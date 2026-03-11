@@ -39,7 +39,7 @@ public class AuthController {
         // O método saveUser já cuida de codificar a senha, então passamos a senha crua
         // mesmo que o DTO tenha a senha crua, pois o serviço vai lidar com isso de
         // forma segura
-        User user = userService.saveUser(request.getUsername(), request.getPassword());
+        User user = userService.registerUser(request);
         return ResponseEntity.ok(new UserDTO(user));
     }
 

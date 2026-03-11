@@ -9,7 +9,7 @@ public class UserDTO {
 
     private Long id;
     private String username;
-    private String role;
+    private User.Role role;
     private String name;
     private String email;
     private String phone;

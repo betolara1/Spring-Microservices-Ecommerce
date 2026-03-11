@@ -12,7 +12,6 @@ import lombok.Data;
 
 @Data
 public class SaveOrderRequest {
-    @NotNull(message = "Customer ID is required")
     private Long customerId;
 
     @NotNull(message = "Order date is required")

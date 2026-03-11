@@ -2,9 +2,9 @@ package com.betolara1.order.service;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import com.betolara1.order.client.UserClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,15 +24,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final RabbitTemplate rabbitTemplate;
-    private final UserClient userClient;
 
-    public OrderService(OrderRepository orderRepository, RabbitTemplate rabbitTemplate, UserClient userClient) {
+    public OrderService(OrderRepository orderRepository, RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
         this.rabbitTemplate = rabbitTemplate;
-        this.userClient = userClient;
     }
 
-    public Page<OrderDTO> getAllOrder(int page, int size){
+    public Page<OrderDTO> findAllOrder(int page, int size){
         Page<Order> orders = orderRepository.findAll(PageRequest.of(page, size));
 
         if (orders.isEmpty()) {
@@ -59,6 +57,15 @@ public class OrderService {
         return orders.map(OrderDTO::new);
     }
 
+    public Page<OrderDTO> findByCustomerIdAndStatus(Long customerId, Order.Status status, int page, int size){
+        Page<Order> orders = orderRepository.findByCustomerIdAndStatus(PageRequest.of(page, size), customerId, status);
+
+        if (orders.isEmpty()) {
+            throw new NotFoundException("Nenhum pedido registrado com o status " + status + " para o cliente " + customerId);
+        }
+        return orders.map(OrderDTO::new);
+    }
+
     public Page<OrderDTO> findByOrderDate(LocalDate date, int page, int size) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(23, 59, 59, 999999999);
@@ -75,11 +82,17 @@ public class OrderService {
         return new OrderDTO(order);
     }
 
+    public OrderDTO getOrderByIdAndCustomerId(Long id, Long customerId){
+        Optional<Order> order = orderRepository.findByIdAndCustomerId(id, customerId);
+        if (order.isEmpty()) {
+            throw new NotFoundException("Pedido não encontrado com ID: " + id + " para o cliente " + customerId);
+        }
+        return new OrderDTO(order.get());
+    }
+
     // Método para salvar o pedido e enviar para o rabbitMQ
     @Transactional
     public Order saveOrder(SaveOrderRequest request) {
-        // 1. Validação síncrona do Cliente via Feign
-        userClient.getUserById(request.getCustomerId());
 
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());

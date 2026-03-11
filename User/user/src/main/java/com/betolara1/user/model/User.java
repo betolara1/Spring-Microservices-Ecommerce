@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -28,7 +30,8 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     
     private String name;
     private String email;
@@ -36,12 +39,15 @@ public class User {
     private String address;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public enum Role{
+        ADMIN,
+        USER
+    }
     
     @PrePersist
     protected void onCreate() { this.createdAt = LocalDateTime.now(); }
 
     @PreUpdate
     protected void onUpdate() { this.updatedAt = LocalDateTime.now(); }
-
-
 }

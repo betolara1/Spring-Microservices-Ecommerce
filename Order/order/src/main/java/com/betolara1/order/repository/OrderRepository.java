@@ -1,6 +1,7 @@
 package com.betolara1.order.repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,5 +14,7 @@ import com.betolara1.order.model.Order;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByStatus(Pageable pageable, Order.Status status);
     Page<Order> findByCustomerId(Pageable pageable, Long customerId);
+    Page<Order> findByCustomerIdAndStatus(Pageable pageable, Long customerId, Order.Status status);
     Page<Order> findByOrderDateBetween(Pageable pageable, LocalDateTime start, LocalDateTime end);
+    Optional<Order> findByIdAndCustomerId(Long id, Long customerId);
 }

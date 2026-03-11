@@ -51,7 +51,7 @@ public class OrderServiceTest {
         Page<Order> page = new PageImpl<>(Collections.singletonList(order));
         when(orderRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
-        Page<OrderDTO> result = orderService.getAllOrder(0, 10);
+        Page<OrderDTO> result = orderService.findAllOrder(0, 10);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -62,7 +62,7 @@ public class OrderServiceTest {
         Page<Order> page = new PageImpl<>(Collections.emptyList());
         when(orderRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
-        assertThrows(NotFoundException.class, () -> orderService.getAllOrder(0, 10));
+        assertThrows(NotFoundException.class, () -> orderService.findAllOrder(0, 10));
     }
 
     @Test
@@ -79,6 +79,23 @@ public class OrderServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(1L, result.getContent().get(0).getCustomerId());
+    }
+
+    @Test
+    void testFindByCustomerIdAndStatus_Success() {
+        Order order = new Order();
+        order.setCustomerId(1L);
+        order.setStatus(Order.Status.PENDING);
+
+        Page<Order> page = new PageImpl<>(Collections.singletonList(order));
+        when(orderRepository.findByCustomerIdAndStatus(any(PageRequest.class), eq(1L), eq(Order.Status.PENDING))).thenReturn(page);
+
+        Page<OrderDTO> result = orderService.findByCustomerIdAndStatus(1L, Order.Status.PENDING, 0, 10);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(1L, result.getContent().get(0).getCustomerId());
+        assertEquals(Order.Status.PENDING, result.getContent().get(0).getStatus());
     }
 
     @Test
@@ -120,8 +137,30 @@ public class OrderServiceTest {
 
         OrderDTO result = orderService.getOrderById(1L);
 
+        assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void testGetOrderByIdAndCustomerId_Success() {
+        Order order = new Order();
+        order.setId(1L);
+        order.setCustomerId(1L);
+        order.setStatus(Order.Status.PENDING);
+
+        when(orderRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(order));
+
+        OrderDTO result = orderService.getOrderByIdAndCustomerId(1L, 1L);
+
         assertNotNull(result);
         assertEquals(1L, result.getId());
+        assertEquals(1L, result.getCustomerId());
+    }
+
+    @Test
+    void testGetOrderByIdAndCustomerId_NotFound() {
+        when(orderRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> orderService.getOrderByIdAndCustomerId(1L, 1L));
     }
 
     @Test
