@@ -36,29 +36,29 @@ public class ProductService {
         return products.map(ProductDTO::new);
     }
 
-    public ProductDTO getProductById(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID: " + id));
-        return new ProductDTO(product);
+    public Page<ProductDTO> getProductById(Long id, int page, int size) {
+        Page<Product> products = productRepository.findById(id, PageRequest.of(page, size));
+        return products.map(ProductDTO::new);
     }
 
-    public ProductDTO getProductBySku(String sku) {
-        Product product = productRepository.findBySku(sku).orElseThrow(() -> new NotFoundException("Produto não encontrado com SKU: " + sku));
-        return new ProductDTO(product);
+    public Page<ProductDTO> getProductBySku(String sku, int page, int size) {
+        Page<Product> products = productRepository.findBySku(sku, PageRequest.of(page, size));
+        return products.map(ProductDTO::new);
     }
 
-    public ProductDTO getProductByCategoryId(Long categoryId) {
-        Product product = productRepository.findByCategoryId(categoryId).orElseThrow(() -> new NotFoundException("Produto não encontrado com ID da categoria: " + categoryId));
-        return new ProductDTO(product);
+    public Page<ProductDTO> getProductByCategoryId(Long categoryId, int page, int size) {
+        Page<Product> products = productRepository.findByCategoryId(categoryId, PageRequest.of(page, size));
+        return products.map(ProductDTO::new);
     }
 
-    public ProductDTO getProductByActive(boolean active) {
-        Product product = productRepository.findByActive(active).orElseThrow(() -> new NotFoundException("Produto não encontrado com status: " + active));
-        return new ProductDTO(product);
+    public Page<ProductDTO> getProductByActive(boolean active, int page, int size) {
+        Page<Product> products = productRepository.findByActive(active, PageRequest.of(page, size));
+        return products.map(ProductDTO::new);
     }
 
-    public ProductDTO getProductByName(String name) {
-        Product product = productRepository.findByName(name).orElseThrow(() -> new NotFoundException("Produto não encontrado com nome: " + name));
-        return new ProductDTO(product);
+    public Page<ProductDTO> getProductByName(String name, int page, int size) {
+        Page<Product> products = productRepository.findByName(name, PageRequest.of(page, size));
+        return products.map(ProductDTO::new);
     }
 
     @Transactional

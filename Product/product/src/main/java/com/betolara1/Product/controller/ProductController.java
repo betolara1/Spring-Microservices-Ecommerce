@@ -1,6 +1,7 @@
 package com.betolara1.product.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +32,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/listAll")
+    @GetMapping("/get/getAll")
     public ResponseEntity<Page<ProductDTO>> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -42,51 +44,77 @@ public class ProductController {
         return ResponseEntity.ok(list);
     }
 
-    // Busca por ID ou nome
-    @GetMapping("/{identifier}")
-    public ResponseEntity<ProductDTO> getProductByIdentifier(@PathVariable String identifier) {
-        ProductDTO product;
-
-        if (identifier.matches("\\d+")) {
-            product = productService.getProductById(Long.parseLong(identifier));
-        } else {
-            product = productService.getProductByName(identifier);
-        }
-
+    // Busca por ID
+    @GetMapping("/get/id={id}")
+    public ResponseEntity<Page<ProductDTO>> getProductById(@PathVariable Long id, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<ProductDTO> product;
+        product = productService.getProductById(id, page, size);
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ProductDTO> getProductByCategoryId(@PathVariable Long categoryId) {
-        ProductDTO product = productService.getProductByCategoryId(categoryId);
+    // Busca por nome
+    @GetMapping("/get/name={name}")
+    public ResponseEntity<Page<ProductDTO>> getProductByName(@PathVariable String name, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<ProductDTO> product;
+        product = productService.getProductByName(name, page, size);
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/active/{active}")
-    public ResponseEntity<ProductDTO> getProductByActive(@PathVariable boolean active) {
-        ProductDTO product = productService.getProductByActive(active);
+    // Busca por SKU
+    @GetMapping("/get/sku={sku}")
+    public ResponseEntity<Page<ProductDTO>> getProductBySku(@PathVariable String sku, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<ProductDTO> product;
+        product = productService.getProductBySku(sku, page, size);
+        return ResponseEntity.ok(product);
+    }
+
+    // Busca por categoria
+    @GetMapping("/get/category={categoryId}")
+    public ResponseEntity<Page<ProductDTO>> getProductByCategoryId(@PathVariable Long categoryId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<ProductDTO> product = productService.getProductByCategoryId(categoryId, page, size);
+        return ResponseEntity.ok(product);
+    }
+
+    @GetMapping("/get/active={active}")
+    public ResponseEntity<Page<ProductDTO>> getProductByActive(@PathVariable boolean active, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<ProductDTO> product = productService.getProductByActive(active, page, size);
         return ResponseEntity.ok(product);
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody CreateProductRequest request) {
-        Product newProduct = productService.saveProduct(request);
-        ProductDTO createdProductDTO = new ProductDTO(newProduct);
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody CreateProductRequest request, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            Product newProduct = productService.saveProduct(request);
+            ProductDTO createdProductDTO = new ProductDTO(newProduct);
 
-        return ResponseEntity.ok(createdProductDTO);
+            return ResponseEntity.ok(createdProductDTO);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @PutMapping("/id/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
-        Product updatedProduct = productService.updateProduct(id, request);
-        ProductDTO updatedProductDTO = new ProductDTO(updatedProduct);
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            Product updatedProduct = productService.updateProduct(id, request);
+            ProductDTO updatedProductDTO = new ProductDTO(updatedProduct);
 
-        return ResponseEntity.ok(updatedProductDTO);
+            return ResponseEntity.ok(updatedProductDTO);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } 
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.ok("Produto deletado com sucesso.");
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            productService.deleteProduct(id);
+            return ResponseEntity.ok("Produto deletado com sucesso.");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }

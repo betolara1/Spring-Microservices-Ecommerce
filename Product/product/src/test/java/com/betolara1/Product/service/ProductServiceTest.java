@@ -15,6 +15,11 @@ import com.betolara1.product.model.Product;
 import com.betolara1.product.repository.ProductRepository;
 import com.betolara1.product.service.ProductService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,28 +50,30 @@ public class ProductServiceTest {
         product.setImageUrl("http://localhost:8080/images/1.jpg");
         product.setActive(true);
 
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findById(eq(1L), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
 
-        ProductDTO result = productService.getProductById(1L);
+        Page<ProductDTO> result = productService.getProductById(1L, 0, 10);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Produto 1", result.getName());
-        assertEquals("SKU1", result.getSku());
-        assertEquals("Descrição 1", result.getDescription());
-        assertEquals(BigDecimal.valueOf(10.0), result.getPrice());
-        assertEquals(1L, result.getCategoryId());
-        assertEquals("http://localhost:8080/images/1.jpg", result.getImageUrl());
-        assertEquals(true, result.isActive());
+        assertEquals(1, result.getTotalElements());
+        ProductDTO dto = result.getContent().get(0);
+        assertEquals(1L, dto.getId());
+        assertEquals("Produto 1", dto.getName());
+        assertEquals("SKU1", dto.getSku());
+        assertEquals("Descrição 1", dto.getDescription());
+        assertEquals(BigDecimal.valueOf(10.0), dto.getPrice());
+        assertEquals(1L, dto.getCategoryId());
+        assertEquals("http://localhost:8080/images/1.jpg", dto.getImageUrl());
+        assertEquals(true, dto.isActive());
     }
 
     @Test
     void testFindById_NotFound(){
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(productRepository.findById(eq(1L), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> productService.getProductById(1L));
+        Page<ProductDTO> result = productService.getProductById(1L, 0, 10);
 
-        assertEquals("Produto não encontrado com ID: 1", exception.getMessage());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -81,28 +88,25 @@ public class ProductServiceTest {
         product.setImageUrl("http://localhost:8080/images/1.jpg");
         product.setActive(true);
 
-        when(productRepository.findBySku("SKU1")).thenReturn(Optional.of(product));
+        when(productRepository.findBySku(eq("SKU1"), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
 
-        ProductDTO result = productService.getProductBySku("SKU1");
+        Page<ProductDTO> result = productService.getProductBySku("SKU1", 0, 10);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Produto 1", result.getName());
-        assertEquals("SKU1", result.getSku());
-        assertEquals("Descrição 1", result.getDescription());
-        assertEquals(BigDecimal.valueOf(10.0), result.getPrice());
-        assertEquals(1L, result.getCategoryId());
-        assertEquals("http://localhost:8080/images/1.jpg", result.getImageUrl());
-        assertEquals(true, result.isActive());
+        assertEquals(1, result.getTotalElements());
+        ProductDTO dto = result.getContent().get(0);
+        assertEquals(1L, dto.getId());
+        assertEquals("Produto 1", dto.getName());
+        assertEquals("SKU1", dto.getSku());
     }
 
     @Test
     void testFindBySku_NotFound(){
-        when(productRepository.findBySku("SKU1")).thenReturn(Optional.empty());
+        when(productRepository.findBySku(eq("SKU1"), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> productService.getProductBySku("SKU1"));
+        Page<ProductDTO> result = productService.getProductBySku("SKU1", 0, 10);
 
-        assertEquals("Produto não encontrado com SKU: SKU1", exception.getMessage());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -117,28 +121,22 @@ public class ProductServiceTest {
         product.setImageUrl("http://localhost:8080/images/1.jpg");
         product.setActive(true);
 
-        when(productRepository.findByCategoryId(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByCategoryId(eq(1L), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
 
-        ProductDTO result = productService.getProductByCategoryId(1L);
+        Page<ProductDTO> result = productService.getProductByCategoryId(1L, 0, 10);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Produto 1", result.getName());
-        assertEquals("SKU1", result.getSku());
-        assertEquals("Descrição 1", result.getDescription());
-        assertEquals(BigDecimal.valueOf(10.0), result.getPrice());
-        assertEquals(1L, result.getCategoryId());
-        assertEquals("http://localhost:8080/images/1.jpg", result.getImageUrl());
-        assertEquals(true, result.isActive());
+        assertEquals(1, result.getTotalElements());
+        assertEquals(1L, result.getContent().get(0).getCategoryId());
     }
 
     @Test
     void findProductByCategory_NotFound(){
-        when(productRepository.findByCategoryId(1L)).thenReturn(Optional.empty());
+        when(productRepository.findByCategoryId(eq(1L), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> productService.getProductByCategoryId(1L));
+        Page<ProductDTO> result = productService.getProductByCategoryId(1L, 0, 10);
 
-        assertEquals("Produto não encontrado com ID da categoria: 1", exception.getMessage());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -153,28 +151,22 @@ public class ProductServiceTest {
         product.setImageUrl("http://localhost:8080/images/1.jpg");
         product.setActive(true);
 
-        when(productRepository.findByActive(true)).thenReturn(Optional.of(product));
+        when(productRepository.findByActive(eq(true), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
 
-        ProductDTO result = productService.getProductByActive(true);
+        Page<ProductDTO> result = productService.getProductByActive(true, 0, 10);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Produto 1", result.getName());
-        assertEquals("SKU1", result.getSku());
-        assertEquals("Descrição 1", result.getDescription());
-        assertEquals(BigDecimal.valueOf(10.0), result.getPrice());
-        assertEquals(1L, result.getCategoryId());
-        assertEquals("http://localhost:8080/images/1.jpg", result.getImageUrl());
-        assertEquals(true, result.isActive());
+        assertEquals(1, result.getTotalElements());
+        assertTrue(result.getContent().get(0).isActive());
     }
 
     @Test
     void findProductByActive_NotFound(){
-        when(productRepository.findByActive(true)).thenReturn(Optional.empty());
+        when(productRepository.findByActive(eq(true), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> productService.getProductByActive(true));
+        Page<ProductDTO> result = productService.getProductByActive(true, 0, 10);
 
-        assertEquals("Produto não encontrado com status: true", exception.getMessage());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -189,28 +181,22 @@ public class ProductServiceTest {
         product.setImageUrl("http://localhost:8080/images/1.jpg");
         product.setActive(true);
 
-        when(productRepository.findByName("Produto 1")).thenReturn(Optional.of(product));
+        when(productRepository.findByName(eq("Produto 1"), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(product)));
 
-        ProductDTO result = productService.getProductByName("Produto 1");
+        Page<ProductDTO> result = productService.getProductByName("Produto 1", 0, 10);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Produto 1", result.getName());
-        assertEquals("SKU1", result.getSku());
-        assertEquals("Descrição 1", result.getDescription());
-        assertEquals(BigDecimal.valueOf(10.0), result.getPrice());
-        assertEquals(1L, result.getCategoryId());
-        assertEquals("http://localhost:8080/images/1.jpg", result.getImageUrl());
-        assertEquals(true, result.isActive());
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Produto 1", result.getContent().get(0).getName());
     }
 
     @Test
     void findProductByName_NotFound(){
-        when(productRepository.findByName("Produto 1")).thenReturn(Optional.empty());
+        when(productRepository.findByName(eq("Produto 1"), any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> productService.getProductByName("Produto 1"));
+        Page<ProductDTO> result = productService.getProductByName("Produto 1", 0, 10);
 
-        assertEquals("Produto não encontrado com nome: Produto 1", exception.getMessage());
+        assertTrue(result.isEmpty());
     }
 
     @Test

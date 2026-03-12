@@ -81,59 +81,80 @@ public class ProductControllerTest {
     }
 
     @Test
-    void testGetProductByIdentifier_ById() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(1L);
-        when(productService.getProductById(1L)).thenReturn(productDTO);
+    void testGetProductByIdentifierById() {
+        Product product = new Product();
+        product.setId(1L);
+        product.setName("Produto 1");
+        
+        Page<Product> page = new PageImpl<>(Collections.singletonList(product));
+        Page<ProductDTO> productDTOPage = page.map(ProductDTO::new);
 
-        ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("1");
+        when(productService.getProductById(1L, 0, 10)).thenReturn(productDTOPage);
+
+        ResponseEntity<Page<ProductDTO>> response = productController.getProductById(1L, 0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        ProductDTO body = response.getBody();
+        Page<ProductDTO> body = response.getBody();
         assertNotNull(body);
-        assertEquals(1L, body.getId());
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1L, body.getContent().get(0).getId());
     }
 
     @Test
-    void testGetProductByIdentifier_ByName() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setName("Produto Teste");
-        when(productService.getProductByName("Produto Teste")).thenReturn(productDTO);
+    void testGetProductByIdentifierByName() {
+        Product product = new Product();
+        product.setName("Produto Teste");
+        
+        Page<Product> page = new PageImpl<>(Collections.singletonList(product));
+        Page<ProductDTO> productDTOPage = page.map(ProductDTO::new);
 
-        ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("Produto Teste");
+        when(productService.getProductByName("Produto Teste", 0, 10)).thenReturn(productDTOPage);
+
+        ResponseEntity<Page<ProductDTO>> response = productController.getProductByName("Produto Teste", 0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        ProductDTO body = response.getBody();
+        Page<ProductDTO> body = response.getBody();
         assertNotNull(body);
-        assertEquals("Produto Teste", body.getName());
+        assertEquals(1, body.getTotalElements());
+        assertEquals("Produto Teste", body.getContent().get(0).getName());
     }
 
     @Test
     void testGetProductByCategoryId() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setCategoryId(1L);
-        when(productService.getProductByCategoryId(1L)).thenReturn(productDTO);
+        Product product = new Product();
+        product.setCategoryId(1L);
+        
+        Page<Product> page = new PageImpl<>(Collections.singletonList(product));
+        Page<ProductDTO> productDTOPage = page.map(ProductDTO::new);
 
-        ResponseEntity<ProductDTO> response = productController.getProductByCategoryId(1L);
+        when(productService.getProductByCategoryId(1L, 0, 10)).thenReturn(productDTOPage);
+
+        ResponseEntity<Page<ProductDTO>> response = productController.getProductByCategoryId(1L, 0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        ProductDTO body = response.getBody();
+        Page<ProductDTO> body = response.getBody();
         assertNotNull(body);
-        assertEquals(1L, body.getCategoryId());
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1L, body.getContent().get(0).getCategoryId());
     }
 
     @Test
     void testGetProductByActive() {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setActive(true);
-        when(productService.getProductByActive(true)).thenReturn(productDTO);
+        Product product = new Product();
+        product.setActive(true);
+        
+        Page<Product> page = new PageImpl<>(Collections.singletonList(product));
+        Page<ProductDTO> productDTOPage = page.map(ProductDTO::new);
 
-        ResponseEntity<ProductDTO> response = productController.getProductByActive(true);
+        when(productService.getProductByActive(true, 0, 10)).thenReturn(productDTOPage);
+
+        ResponseEntity<Page<ProductDTO>> response = productController.getProductByActive(true, 0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        ProductDTO body = response.getBody();
+        Page<ProductDTO> body = response.getBody();
         assertNotNull(body);
-        assertTrue(body.isActive());
+        assertEquals(1, body.getTotalElements());
+        assertTrue(body.getContent().get(0).isActive());
     }
 
     @Test
@@ -145,13 +166,22 @@ public class ProductControllerTest {
 
         when(productService.saveProduct(any(CreateProductRequest.class))).thenReturn(product);
 
-        ResponseEntity<ProductDTO> response = productController.createProduct(request);
+        ResponseEntity<ProductDTO> response = productController.createProduct(request, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ProductDTO body = response.getBody();
         assertNotNull(body);
         assertEquals(1L, body.getId());
         assertEquals("Produto Novo", body.getName());
+    }
+
+    @Test
+    void testCreateProductError() {
+        CreateProductRequest request = new CreateProductRequest();
+
+        ResponseEntity<ProductDTO> response = productController.createProduct(request, "USER");
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -163,7 +193,7 @@ public class ProductControllerTest {
 
         when(productService.updateProduct(eq(1L), any(UpdateProductRequest.class))).thenReturn(product);
 
-        ResponseEntity<ProductDTO> response = productController.updateProduct(1L, request);
+        ResponseEntity<ProductDTO> response = productController.updateProduct(1L, request, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ProductDTO body = response.getBody();
@@ -172,15 +202,32 @@ public class ProductControllerTest {
         assertEquals("Produto Atualizado", body.getName());
     }
 
+    
+    @Test
+    void testUpdateProductError() {
+        UpdateProductRequest request = new UpdateProductRequest();
+
+        ResponseEntity<ProductDTO> response = productController.updateProduct(1L, request, "USER");
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
     @Test
     void testDeleteProduct() {
         doNothing().when(productService).deleteProduct(1L);
 
-        ResponseEntity<String> response = productController.deleteProduct(1L);
+        ResponseEntity<String> response = productController.deleteProduct(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Produto deletado com sucesso.", response.getBody());
         verify(productService, times(1)).deleteProduct(1L);
+    }
+
+    @Test
+    void testDeleteProductError() {
+        ResponseEntity<String> response = productController.deleteProduct(1L, "USER");
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
 }
