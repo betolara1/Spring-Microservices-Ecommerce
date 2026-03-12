@@ -29,7 +29,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/user/getAll")
+    @GetMapping("/get/getAll")
     public ResponseEntity<Page<UserDTO>> getAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
@@ -57,7 +57,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             userService.deleteUser(id);
@@ -66,7 +66,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @PutMapping("/user/{id}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updatedUser, @RequestHeader("X-User-Id") Long userId) {
         if(userId.equals(id)){
             User userDB = userService.updateUser(id, updatedUser);
