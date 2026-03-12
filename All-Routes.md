@@ -8,11 +8,87 @@ O Gateway é a porta de entrada para todas as requisições externas. No ambient
 | Microserviço | Prefixo da Rota | URL Exemplo |
 | :--- | :--- | :--- |
 | **User (Auth)** | `/auth/**` | [http://localhost:8080/auth/login](http://localhost:8080/auth/login) |
-| **User (Perfil)** | `/users/**` | [http://localhost:8080/users/listAll](http://localhost:8080/users/listAll) |
-| **Product** | `/products/**` | [http://localhost:8080/products/listAll](http://localhost:8080/products/listAll) |
-| **Order** | `/orders/**` | [http://localhost:8080/orders/listAll](http://localhost:8080/orders/listAll) |
-| **Inventory** | `/inventory/**` | [http://localhost:8080/inventory/listAll](http://localhost:8080/inventory/listAll) |
-| **Payments** | `/payments/**` | [http://localhost:8080/payments/listAll](http://localhost:8080/payments/listAll) |
+| **User (Perfil)** | `/users/**` | [http://localhost:8080/users/get/getAll](http://localhost:8080/users/get/getAll) |
+| **Product** | `/products/**` | [http://localhost:8080/products/get/getAll](http://localhost:8080/products/get/getAll) |
+| **Order** | `/orders/**` | [http://localhost:8080/orders/get/getAll](http://localhost:8080/orders/get/getAll) |
+| **Inventory** | `/inventory/**` | [http://localhost:8080/inventory/get/getAll](http://localhost:8080/inventory/get/getAll) |
+| **Payments** | `/payments/**` | [http://localhost:8080/payments/get/getAll](http://localhost:8080/payments/get/getAll) |
+
+---
+
+## 📋 Rotas Detalhadas por Microserviço
+
+### 🔐 Auth (`/auth`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/auth/register` | Registrar novo usuário | Público | — |
+| `POST` | `/auth/login` | Login (retorna JWT) | Público | — |
+
+---
+
+### 👤 User (`/users`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/users/get/getAll` | Listar todos (ADMIN) ou próprio perfil (USER) | ADMIN / USER | `X-User-Role`, `X-User-Id` |
+| `PUT` | `/users/edit/{id}` | Atualizar próprio perfil | Próprio usuário | `X-User-Id` |
+| `DELETE` | `/users/delete/{id}` | Deletar usuário | ADMIN | `X-User-Role` |
+
+---
+
+### 📦 Product (`/products`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/products/get/getAll` | Listar todos os produtos | Público | — |
+| `GET` | `/products/get/id={id}` | Buscar produto por ID | Público | — |
+| `GET` | `/products/get/name={name}` | Buscar produto por nome | Público | — |
+| `GET` | `/products/get/sku={sku}` | Buscar produto por SKU | Público | — |
+| `GET` | `/products/get/category={categoryId}` | Buscar produtos por categoria | Público | — |
+| `GET` | `/products/get/active={active}` | Buscar produtos ativos/inativos | Público | — |
+| `POST` | `/products` | Criar produto | ADMIN | `X-User-Role` |
+| `PUT` | `/products/edit/{id}` | Atualizar produto | ADMIN | `X-User-Role` |
+| `DELETE` | `/products/delete/{id}` | Deletar produto | ADMIN | `X-User-Role` |
+
+---
+
+### 🛒 Order (`/orders`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/orders/get/getAll` | Listar todos (ADMIN) ou próprios pedidos (USER) | ADMIN / USER | `X-User-Role`, `X-User-Id` |
+| `GET` | `/orders/get/customerId={customerId}` | Buscar pedidos por cliente | ADMIN | `X-User-Role` |
+| `GET` | `/orders/get/status={status}` | Buscar por status (ADMIN: todos, USER: próprios) | ADMIN / USER | `X-User-Role`, `X-User-Id` |
+| `GET` | `/orders/get/orderDate={orderDate}` | Buscar por data (formato: `yyyy-MM-dd`) | ADMIN | `X-User-Role`, `X-User-Id` |
+| `GET` | `/orders/get/id={id}` | Buscar pedido por ID (ADMIN: qualquer, USER: próprio) | ADMIN / USER | `X-User-Role`, `X-User-Id` |
+| `POST` | `/orders` | Criar pedido (customerId é preenchido automaticamente) | Autenticado | `X-User-Id` |
+| `PUT` | `/orders/edit/{id}` | Atualizar pedido | ADMIN | `X-User-Role` |
+| `DELETE` | `/orders/delete/{id}` | Deletar pedido | ADMIN | `X-User-Role` |
+
+---
+
+### 📊 Inventory (`/inventory`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/inventory/get/getAll` | Listar todo o estoque | ADMIN | `X-User-Role` |
+| `GET` | `/inventory/get/status={status}` | Buscar estoque por status | ADMIN | `X-User-Role` |
+| `GET` | `/inventory/get/id={id}` | Buscar estoque por ID | ADMIN | `X-User-Role` |
+| `GET` | `/inventory/get/sku={sku}` | Buscar estoque por SKU | ADMIN | `X-User-Role` |
+| `POST` | `/inventory` | Criar estoque | ADMIN | `X-User-Role` |
+| `PUT` | `/inventory/edit/{id}` | Atualizar estoque | ADMIN | `X-User-Role` |
+| `DELETE` | `/inventory/delete/{id}` | Deletar estoque | ADMIN | `X-User-Role` |
+
+---
+
+### 💳 Payments (`/payments`)
+| Método | Rota | Descrição | Acesso | Headers |
+| :--- | :--- | :--- | :--- | :--- |
+| `GET` | `/payments/get/getAll` | Listar todos (ADMIN) ou próprios pagamentos (USER) | ADMIN / USER | `X-User-Role`, `X-User-Id` |
+| `GET` | `/payments/get/status={status}` | Buscar pagamentos por status | ADMIN | `X-User-Role` |
+| `GET` | `/payments/get/paymentMethod={paymentMethod}` | Buscar por método de pagamento | ADMIN | `X-User-Role` |
+| `GET` | `/payments/get/id={id}` | Buscar pagamento por ID | ADMIN | `X-User-Role` |
+| `GET` | `/payments/get/orderId={orderId}` | Buscar pagamento por ID do pedido | ADMIN | `X-User-Role` |
+| `GET` | `/payments/get/transactionId={transactionId}` | Buscar pagamento por transação | ADMIN | `X-User-Role` |
+| `POST` | `/payments` | Criar pagamento | ADMIN | `X-User-Role` |
+| `PUT` | `/payments/edit/{id}` | Atualizar pagamento | ADMIN | `X-User-Role` |
+| `DELETE` | `/payments/delete/{id}` | Deletar pagamento | ADMIN | `X-User-Role` |
 
 ---
 
