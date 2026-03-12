@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class PaymentDTO {
     private Long id;
+    private Long userId;
     private Long orderId;
     private String transactionId;
     private LocalDateTime paymentDate;
@@ -21,6 +22,7 @@ public class PaymentDTO {
 
     public PaymentDTO(Payment payment) {
         this.id = payment.getId();
+        this.userId = payment.getUserId();
         this.orderId = payment.getOrderId();
         this.transactionId = payment.getTransactionId();
         this.paymentDate = payment.getPaymentDate();

@@ -1,6 +1,7 @@
 package com.betolara1.payments.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,77 +32,134 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping("/listAll")
+    @GetMapping("/get/getAll")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(            
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestHeader("X-User-Role") String role,
+            @RequestHeader("X-User-Id") Long userId) {
 
-        Page<PaymentDTO> list = paymentService.getAllPayments(page, size);
-        if (list.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento cadastrado.");
+        if(role.equals("ADMIN")){
+            Page<PaymentDTO> list = paymentService.getAllPayments(page, size);
+            if (list.isEmpty()) {
+                throw new NotFoundException("Nenhum pagamento cadastrado.");
+            }
+            return ResponseEntity.ok(list);
         }
-        return ResponseEntity.ok(list);
+        else if(role.equals("USER")){
+            Page<PaymentDTO> list = paymentService.getUserById(userId, page, size);
+            if (list.isEmpty()) {
+                throw new NotFoundException("Nenhum pagamento cadastrado.");
+            }
+            return ResponseEntity.ok(list);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<Page<PaymentDTO>> getPaymentByStatus(@PathVariable Payment.Status status, 
+    @GetMapping("/get/status={status}")
+    public ResponseEntity<Page<PaymentDTO>> getPaymentByStatus(
+            @PathVariable Payment.Status status, 
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestHeader("X-User-Role") String role) {
 
-        Page<PaymentDTO> list = paymentService.getPaymentByStatus(page, size, status);
-        if (list.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento cadastrado.");
+        if(role.equals("ADMIN")){
+            Page<PaymentDTO> list = paymentService.getPaymentByStatus(page, size, status);
+            if (list.isEmpty()) {
+                throw new NotFoundException("Nenhum pagamento cadastrado.");
+            }
+            return ResponseEntity.ok(list);
         }
-        return ResponseEntity.ok(list);
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @GetMapping("/paymentMethod/{paymentMethod}")
-    public ResponseEntity<Page<PaymentDTO>> getPaymentByPaymentMethod(@PathVariable String paymentMethod, 
+    @GetMapping("/get/paymentMethod={paymentMethod}")
+    public ResponseEntity<Page<PaymentDTO>> getPaymentByPaymentMethod(
+            @PathVariable String paymentMethod, 
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestHeader("X-User-Role") String role) {
                 
-        Page<PaymentDTO> list = paymentService.getPaymentByPaymentMethod(page, size, paymentMethod);
-        if (list.isEmpty()) {
-            throw new NotFoundException("Nenhum pagamento cadastrado.");
+        if(role.equals("ADMIN")){
+            Page<PaymentDTO> list = paymentService.getPaymentByPaymentMethod(page, size, paymentMethod);
+            if (list.isEmpty()) {
+                throw new NotFoundException("Nenhum pagamento cadastrado.");
+            }
+            return ResponseEntity.ok(list);
+        }else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id) {
-        PaymentDTO payment = paymentService.getPaymentById(id);
-        return ResponseEntity.ok(payment);
+    @GetMapping("/get/id={id}")
+    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            PaymentDTO payment = paymentService.getPaymentById(id);
+            return ResponseEntity.ok(payment);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @GetMapping("/orderId/{orderId}")
-    public ResponseEntity<PaymentDTO> getPaymentByOrderId(@PathVariable Long orderId) {
-        PaymentDTO payment = paymentService.getPaymentByOrderId(orderId);
-        return ResponseEntity.ok(payment);
+    @GetMapping("/get/orderId={orderId}")
+    public ResponseEntity<PaymentDTO> getPaymentByOrderId(@PathVariable Long orderId, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            PaymentDTO payment = paymentService.getPaymentByOrderId(orderId);
+            return ResponseEntity.ok(payment);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @GetMapping("/transactionId/{transactionId}")
-    public ResponseEntity<PaymentDTO> getPaymentByTransactionId(@PathVariable String transactionId) {
-        PaymentDTO payment = paymentService.getPaymentByTransactionId(transactionId);
-        return ResponseEntity.ok(payment);
+    @GetMapping("/get/transactionId={transactionId}")
+    public ResponseEntity<PaymentDTO> getPaymentByTransactionId(@PathVariable String transactionId, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            PaymentDTO payment = paymentService.getPaymentByTransactionId(transactionId);
+            return ResponseEntity.ok(payment);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody CreatePaymentsRequest request) {
-        Payment savedPayment = paymentService.savePayment(request);
-        PaymentDTO paymentDTO = new PaymentDTO(savedPayment);
-        return ResponseEntity.ok(paymentDTO);
+    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody CreatePaymentsRequest request, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            Payment savedPayment = paymentService.savePayment(request);
+            PaymentDTO paymentDTO = new PaymentDTO(savedPayment);
+            return ResponseEntity.ok(paymentDTO);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @PutMapping("/id/{id}")
-    public ResponseEntity<PaymentDTO> updatePayment(@Valid @RequestBody UpdatePaymentsRequest request, @PathVariable Long id) {
-        Payment updatedPayment = paymentService.updatePayment(id, request);
-        PaymentDTO paymentDTO = new PaymentDTO(updatedPayment);
-        return ResponseEntity.ok(paymentDTO);
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<PaymentDTO> updatePayment(@Valid @RequestBody UpdatePaymentsRequest request, @PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            Payment updatedPayment = paymentService.updatePayment(id, request);
+            PaymentDTO paymentDTO = new PaymentDTO(updatedPayment);
+            return ResponseEntity.ok(paymentDTO);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deletePayment(@PathVariable Long id) {
-        paymentService.deletePayment(id);
-        return ResponseEntity.ok("Pagamento deletado com sucesso.");
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deletePayment(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
+        if(role.equals("ADMIN")){
+            paymentService.deletePayment(id);
+            return ResponseEntity.ok("Pagamento deletado com sucesso.");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }

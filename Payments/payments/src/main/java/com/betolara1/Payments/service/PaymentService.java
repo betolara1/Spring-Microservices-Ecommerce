@@ -47,6 +47,14 @@ public class PaymentService {
         return payments.map(PaymentDTO::new);
     }
 
+    public Page<PaymentDTO> getUserById(Long id, int page, int size) {
+        Page<Payment> payments = paymentRepository.findByUserId(PageRequest.of(page, size), id);
+        if (payments.isEmpty()) {
+            throw new NotFoundException("Nenhum pagamento registrado.");
+        }
+        return payments.map(PaymentDTO::new);
+    }
+
     public PaymentDTO getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com ID: " + id));
         return new PaymentDTO(payment);
@@ -66,6 +74,7 @@ public class PaymentService {
     public Payment savePayment(CreatePaymentsRequest request) {
         Payment payment = new Payment();
         payment.setOrderId(request.getOrderId());
+        payment.setUserId(request.getUserId());
         payment.setTransactionId(request.getTransactionId());
         payment.setPaymentDate(request.getPaymentDate());
         payment.setStatus(Payment.Status.valueOf(request.getStatus().name()));
@@ -82,7 +91,7 @@ public class PaymentService {
             existingPayment.setOrderId(updatedPayment.getOrderId());
         }
         if (updatedPayment.getStatus() != null) {
-            existingPayment.setStatus(updatedPayment.getStatus()); // Sem usar o .name()
+            existingPayment.setStatus(updatedPayment.getStatus());
         }
         if (updatedPayment.getPaymentDate() != null) {
             existingPayment.setPaymentDate(updatedPayment.getPaymentDate());

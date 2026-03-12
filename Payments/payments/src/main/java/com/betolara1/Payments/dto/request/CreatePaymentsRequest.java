@@ -15,6 +15,9 @@ public class CreatePaymentsRequest {
     @NotNull(message = "Order ID is required")
     private Long orderId;
 
+    @NotNull(message = "User ID is required")
+    private Long userId;
+
     @NotBlank(message = "Transaction ID is required")
     private String transactionId;
 

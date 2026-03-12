@@ -48,11 +48,14 @@ public class PaymentControllerTest {
 
         when(paymentService.getAllPayments(0, 10)).thenReturn(page);
 
-        ResponseEntity<Page<PaymentDTO>> response = paymentController.getAllPayments(0, 10);
+        ResponseEntity<Page<PaymentDTO>> response = paymentController.getAllPayments(0, 10, "ADMIN", 1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getTotalElements());
+        Page<PaymentDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1, body.getContent().size());
     }
 
     @Test
@@ -60,7 +63,7 @@ public class PaymentControllerTest {
         when(paymentService.getAllPayments(0, 10)).thenThrow(new NotFoundException("Nenhum pagamento cadastrado."));
 
         NotFoundException exception = assertThrows(NotFoundException.class, () -> {
-            paymentController.getAllPayments(0, 10);
+            paymentController.getAllPayments(0, 10, "ADMIN", 1L);
         });
 
         assertTrue(exception.getMessage().contains("Nenhum pagamento cadastrado."));
@@ -74,11 +77,14 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentByStatus(0, 10, Payment.Status.COMPLETED)).thenReturn(page);
 
-        ResponseEntity<Page<PaymentDTO>> response = paymentController.getPaymentByStatus(Payment.Status.COMPLETED, 0, 10);
+        ResponseEntity<Page<PaymentDTO>> response = paymentController.getPaymentByStatus(Payment.Status.COMPLETED, 0, 10, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(Payment.Status.COMPLETED, response.getBody().getContent().get(0).getStatus());
+        Page<PaymentDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1, body.getContent().size());
     }
 
     @Test
@@ -89,11 +95,14 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentByPaymentMethod(0, 10, "CREDIT_CARD")).thenReturn(page);
 
-        ResponseEntity<Page<PaymentDTO>> response = paymentController.getPaymentByPaymentMethod("CREDIT_CARD", 0, 10);
+        ResponseEntity<Page<PaymentDTO>> response = paymentController.getPaymentByPaymentMethod("CREDIT_CARD", 0, 10, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("CREDIT_CARD", response.getBody().getContent().get(0).getPaymentMethod());
+        Page<PaymentDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1, body.getContent().size());
     }
 
     @Test
@@ -103,11 +112,13 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentById(1L)).thenReturn(payment);
 
-        ResponseEntity<PaymentDTO> response = paymentController.getPaymentById(1L);
+        ResponseEntity<PaymentDTO> response = paymentController.getPaymentById(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
+        PaymentDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
     }
 
     @Test
@@ -117,11 +128,13 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentByOrderId(1L)).thenReturn(payment);
 
-        ResponseEntity<PaymentDTO> response = paymentController.getPaymentByOrderId(1L);
+        ResponseEntity<PaymentDTO> response = paymentController.getPaymentByOrderId(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getOrderId());
+        PaymentDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getOrderId());
     }
 
     @Test
@@ -131,11 +144,13 @@ public class PaymentControllerTest {
 
         when(paymentService.getPaymentByTransactionId("TXN123")).thenReturn(payment);
 
-        ResponseEntity<PaymentDTO> response = paymentController.getPaymentByTransactionId("TXN123");
+        ResponseEntity<PaymentDTO> response = paymentController.getPaymentByTransactionId("TXN123", "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("TXN123", response.getBody().getTransactionId());
+        PaymentDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals("TXN123", body.getTransactionId());
     }
 
     @Test
@@ -148,11 +163,13 @@ public class PaymentControllerTest {
 
         when(paymentService.savePayment(any())).thenReturn(payment);
 
-        ResponseEntity<PaymentDTO> response = paymentController.createPayment(request);
+        ResponseEntity<PaymentDTO> response = paymentController.createPayment(request, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
+        PaymentDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
     }
 
     @Test
@@ -165,21 +182,47 @@ public class PaymentControllerTest {
 
         when(paymentService.updatePayment(eq(1L), any())).thenReturn(payment);
 
-        ResponseEntity<PaymentDTO> response = paymentController.updatePayment(request, 1L);
+        ResponseEntity<PaymentDTO> response = paymentController.updatePayment(request, 1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
+        PaymentDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
     }
 
     @Test
     void testDeletePayment() {
         doNothing().when(paymentService).deletePayment(1L);
 
-        ResponseEntity<String> response = paymentController.deletePayment(1L);
+        ResponseEntity<String> response = paymentController.deletePayment(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Pagamento deletado com sucesso.", response.getBody());
         verify(paymentService, times(1)).deletePayment(1L);
+    }
+
+    @Test
+    void testGetAllPayments_UserSuccess() {
+        PaymentDTO payment = new PaymentDTO();
+        payment.setUserId(1L);
+        Page<PaymentDTO> page = new PageImpl<>(Collections.singletonList(payment));
+
+        when(paymentService.getUserById(1L, 0, 10)).thenReturn(page);
+
+        ResponseEntity<Page<PaymentDTO>> response = paymentController.getAllPayments(0, 10, "USER", 1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        Page<PaymentDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1L, body.getContent().get(0).getUserId());
+    }
+
+    @Test
+    void testGetAllPayments_Forbidden() {
+        ResponseEntity<Page<PaymentDTO>> response = paymentController.getAllPayments(0, 10, "GUEST", 1L);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 }
