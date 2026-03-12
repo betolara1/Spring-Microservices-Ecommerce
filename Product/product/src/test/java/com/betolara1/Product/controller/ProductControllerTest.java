@@ -60,8 +60,10 @@ public class ProductControllerTest {
         
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getTotalElements());
-        assertEquals(1, response.getBody().getContent().size());
+        Page<ProductDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1, body.getContent().size());
     }
 
     @Test
@@ -87,8 +89,9 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
     }
 
     @Test
@@ -100,8 +103,9 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.getProductByIdentifier("Produto Teste");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Produto Teste", response.getBody().getName());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals("Produto Teste", body.getName());
     }
 
     @Test
@@ -113,8 +117,9 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.getProductByCategoryId(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getCategoryId());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getCategoryId());
     }
 
     @Test
@@ -126,8 +131,9 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.getProductByActive(true);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isActive());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertTrue(body.isActive());
     }
 
     @Test
@@ -142,9 +148,10 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.createProduct(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
-        assertEquals("Produto Novo", response.getBody().getName());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
+        assertEquals("Produto Novo", body.getName());
     }
 
     @Test
@@ -159,9 +166,10 @@ public class ProductControllerTest {
         ResponseEntity<ProductDTO> response = productController.updateProduct(1L, request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
-        assertEquals("Produto Atualizado", response.getBody().getName());
+        ProductDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1L, body.getId());
+        assertEquals("Produto Atualizado", body.getName());
     }
 
     @Test

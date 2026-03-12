@@ -3,7 +3,7 @@ services:
     build: .
     container_name: user-ms
     ports:
-      - "8080:8080"
+      - "8085:8080"
     networks:
       - ecommerce-net
     depends_on:

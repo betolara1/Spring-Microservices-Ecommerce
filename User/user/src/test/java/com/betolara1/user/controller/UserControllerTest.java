@@ -45,9 +45,10 @@ public class UserControllerTest {
         ResponseEntity<Page<UserDTO>> response = userController.getAll(0, 10, "ADMIN", 1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getTotalElements());
-        assertEquals(1, response.getBody().getContent().size());
+        Page<UserDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
+        assertEquals(1, body.getContent().size());
     }
 
     @Test
@@ -63,8 +64,9 @@ public class UserControllerTest {
         ResponseEntity<Page<UserDTO>> response = userController.getAll(0, 10, "USER", 1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().getTotalElements());
+        Page<UserDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.getTotalElements());
     }
 
     @Test
@@ -87,7 +89,8 @@ public class UserControllerTest {
         ResponseEntity<String> response = userController.deleteUser(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Usuário deletado com sucesso", response.getBody());
+        String body = response.getBody();
+        assertEquals("Usuário deletado com sucesso", body);
     }
 
     @Test
@@ -113,8 +116,9 @@ public class UserControllerTest {
         ResponseEntity<UserDTO> response = userController.updateUser(1L, updatedData, 1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("New Name", response.getBody().getName());
+        UserDTO body = response.getBody();
+        assertNotNull(body);
+        assertEquals("New Name", body.getName());
     }
 
     @Test

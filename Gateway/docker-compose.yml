@@ -3,7 +3,7 @@ services:
     build: .
     container_name: gateway-ms
     ports:
-      - "8087:8080" # Você acessará o Gateway pela 8087
+      - "8080:8080" # Você acessará o Gateway pela 8080
     networks:
       - ecommerce-net
     depends_on:

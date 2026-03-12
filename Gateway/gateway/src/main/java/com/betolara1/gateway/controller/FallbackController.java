@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FallbackController {
 
-    @GetMapping("/fallback")
+    @org.springframework.web.bind.annotation.RequestMapping("/fallback")
     public ResponseEntity<String> fallback() {
         return ResponseEntity.status(503)
                 .body("⚠️ Serviço temporariamente indisponível. Por favor, tente novamente mais tarde.");
