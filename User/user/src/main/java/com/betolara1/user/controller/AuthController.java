@@ -51,7 +51,7 @@ public class AuthController {
         // O matches verifica se a senha crua bate com o hash
         // Se o usuário existir e a senha estiver correta, gera o token JWT
         if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            String token = jwtUtil.generateToken(user.getUsername());
+            String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole().name());
 
             // Retorna o token JWT e o username do usuário no LoginDTO
             // O LoginDTO é uma forma segura e clara de enviar apenas as informações

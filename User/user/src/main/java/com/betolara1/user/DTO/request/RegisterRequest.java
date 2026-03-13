@@ -16,9 +16,6 @@ public class RegisterRequest {
     @Size(min = 8, max = 30)
     private String password;
 
-    @NotNull
-    private User.Role role;
-
     @NotBlank
     private String name;
 

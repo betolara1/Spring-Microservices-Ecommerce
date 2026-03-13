@@ -61,9 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Pega o ID ou username do usuário (depende de como vc montou o token)
-            String userId = claims.getSubject();
-            String roles = claims.get("roles", String.class);
+            // Pega os dados do usuário que foram colocados no token pelo User Service
+            String userId = String.valueOf(claims.get("userId", Long.class));
+            String role = claims.get("role", String.class);
 
             // IMPORTANTE: O Gateway cria uma NOVA requisição colocando headers simples e encaminha.
             // Para Servlet Filter, normalmente usamos um HttpServletRequestWrapper para injetar headers.
@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 @Override
                 public String getHeader(String name) {
                     if ("X-User-Id".equalsIgnoreCase(name)) return userId;
-                    if ("X-User-Roles".equalsIgnoreCase(name)) return roles;
+                    if ("X-User-Role".equalsIgnoreCase(name)) return role;
                     return super.getHeader(name);
                 }
             };
