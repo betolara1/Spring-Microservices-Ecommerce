@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageImpl;
 import com.betolara1.order.dto.request.SaveOrderRequest;
 import com.betolara1.order.dto.request.UpdateOrderRequest;
 import com.betolara1.order.dto.response.OrderDTO;
-import com.betolara1.order.exception.NotFoundException;
 import com.betolara1.order.model.Order;
 import com.betolara1.order.service.OrderService;
 

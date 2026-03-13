@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import com.betolara1.order.client.UserClient;
 import com.betolara1.order.dto.request.SaveOrderRequest;
 import com.betolara1.order.dto.request.UpdateOrderRequest;
 import com.betolara1.order.dto.response.OrderDTO;
@@ -35,9 +34,6 @@ public class OrderServiceTest {
 
     @Mock
     private RabbitTemplate rabbitTemplate;
-
-    @Mock
-    private UserClient userClient;
 
     @InjectMocks
     private OrderService orderService;
@@ -186,7 +182,6 @@ public class OrderServiceTest {
         savedOrder.setStatus(Order.Status.PENDING);
         savedOrder.setTotalAmount(BigDecimal.valueOf(100.0));
 
-        when(userClient.getUserById(1L)).thenReturn(null); // Assuming UserClient returns some ResponseEntity or UserDTO, mocked as null for simplicity
         when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
         doNothing().when(rabbitTemplate).convertAndSend(anyString(), anyString(), any(Object.class));
 

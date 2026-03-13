@@ -44,7 +44,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.getAllInventory(0, 10)).thenReturn(page);
 
-        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getAllInventory(0, 10);
+        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getAllInventory(0, 10, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -60,7 +60,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.getInventoryByStatus(Inventory.Status.AVAILABLE, 0, 10)).thenReturn(page);
 
-        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getInventoryByStatus(Inventory.Status.AVAILABLE, 0, 10);
+        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getInventoryByStatus(Inventory.Status.AVAILABLE, 0, 10, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -74,7 +74,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.getInventoryById(1L)).thenReturn(inventory);
 
-        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryById(1L);
+        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryById(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -88,7 +88,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.getInventoryBySku("SKU123")).thenReturn(inventory);
 
-        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryBySku("SKU123");
+        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryBySku("SKU123", "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -106,7 +106,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.saveInventory(any(SaveInventoryRequest.class))).thenReturn(newInventory);
 
-        ResponseEntity<InventoryDTO> response = inventoryController.createInventory(request);
+        ResponseEntity<InventoryDTO> response = inventoryController.createInventory(request, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -124,7 +124,7 @@ public class InventoryControllerTest {
 
         when(inventoryService.updateInventory(eq(1L), any(UpdateInventoryRequest.class))).thenReturn(inventory);
 
-        ResponseEntity<InventoryDTO> response = inventoryController.updateInventory(1L, request);
+        ResponseEntity<InventoryDTO> response = inventoryController.updateInventory(1L, request, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -136,10 +136,52 @@ public class InventoryControllerTest {
     void testDeleteInventory_Success() {
         doNothing().when(inventoryService).deleteInventory(1L);
 
-        ResponseEntity<String> response = inventoryController.deleteInventory(1L);
+        ResponseEntity<String> response = inventoryController.deleteInventory(1L, "ADMIN");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Estoque deletado com sucesso!", response.getBody());
         verify(inventoryService, times(1)).deleteInventory(1L);
+    }
+
+    @Test
+    void testGetAllInventory_Forbidden() {
+        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getAllInventory(0, 10, "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testGetInventoryByStatus_Forbidden() {
+        ResponseEntity<Page<InventoryDTO>> response = inventoryController.getInventoryByStatus(Inventory.Status.AVAILABLE, 0, 10, "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testGetInventoryById_Forbidden() {
+        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryById(1L, "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testGetInventoryBySku_Forbidden() {
+        ResponseEntity<InventoryDTO> response = inventoryController.getInventoryBySku("SKU123", "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testCreateInventory_Forbidden() {
+        ResponseEntity<InventoryDTO> response = inventoryController.createInventory(new SaveInventoryRequest(), "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdateInventory_Forbidden() {
+        ResponseEntity<InventoryDTO> response = inventoryController.updateInventory(1L, new UpdateInventoryRequest(), "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteInventory_Forbidden() {
+        ResponseEntity<String> response = inventoryController.deleteInventory(1L, "USER");
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 }
