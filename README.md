@@ -2,7 +2,7 @@
 
 Um projeto de e-commerce desenvolvido com **Spring Boot 3.5.8** e **Java 17**, utilizando arquitetura de **microserviços** para aprender e praticar várias funcionalidades avançadas do Spring Boot.
 
-> ✅ **Status:** Fases 1 a 4 Concluídas — Todos os 5 microserviços foram completamente refatorados, padronizados e estão 100% operacionais. (Fase 5: Mensageria RabbitMQ em andamento).
+> ✅ **Status:** 100% Concluído — O ecossistema integrado (Gateway, Eureka e as APIs) foi finalizado, validado e está totalmente operacional via mensageria RabbitMQ.
 
 ## 📋 Sobre o Projeto
 
@@ -34,7 +34,7 @@ graph TD
     end
 
     subgraph "Microserviços"
-        US[User Service<br/>Porta: 8080]
+        US[User Service<br/>Porta: 8085]
         PS[Product Service<br/>Porta: 8083]
         IS[Inventory Service<br/>Porta: 8081]
         OS[Order Service<br/>Porta: 8082]
@@ -107,7 +107,7 @@ meu-ecommerce-microservicos/
 ### 📦 Microserviços
 
 #### **User (Autenticação e Usuários)**
-- **Porta:** 8080
+- **Porta:** 8085
 - **Descrição:** Autenticação (JWT, Login, Registro), gestão de usuários
 - **Java Version:** 21 (Docker runtime) / 17 (Source)
 - **Dependências principais:** Spring Data JPA, Spring Security, JWT, Swagger, Actuator
@@ -148,8 +148,8 @@ meu-ecommerce-microservicos/
 
 ## 🔧 Tecnologias Utilizadas
 
-- **Java 21**
-- **Spring Boot 4.0.1 / 4.0.2**
+- **Java 17**
+- **Spring Boot 3.5.8**
   - Spring Boot Starter Web
   - Spring Boot Starter Data JPA
   - Spring Boot Starter AMQP
@@ -166,7 +166,7 @@ meu-ecommerce-microservicos/
 
 ### Pré-requisitos
 
-- Java 21+
+- Java 17+
 - Docker & Docker Compose
 - Maven 3.6+ (ou usar `mvnw`)
 
@@ -216,7 +216,7 @@ mvn spring-boot:run
 Os microserviços se comunicam através de **filas RabbitMQ (AMQP)**:
 
 ```
-User Service (8080) → [Autenticação]
+User Service (8085) → [Autenticação]
 Product Service (8083) → [Catálogo de Produtos]
 Inventory Service (8081) ← [Verificar Estoque]
 Order Service (8082) → [Criar Pedidos] → Inventory Service
@@ -229,7 +229,7 @@ Payments Service (8084) → [Processar Transação] → Order Service
 
 ### 1. Registro e Autenticação do Usuário
 ```
-Cliente → POST /auth/register → User Service (8080)
+Cliente → POST /auth/register → User Service (8085)
         ↓
         User Service valida, criptografa senha e armazena no PostgreSQL
         ↓
@@ -299,7 +299,9 @@ microservico/
 
 ## 🔗 Endpoints Disponíveis
 
-### User Service (8080) - Autenticação e Usuários
+> 🚪 **Acesso via API Gateway:** Todas as requisições externas devem ser direcionadas unicamente para o **Gateway na porta `8080`** (`http://localhost:8080/...`). O Gateway fará o roteamento automático para os respectivos microserviços. As portas listadas abaixo representam apenas onde cada serviço opera internamente.
+
+### User Service (Porta Interna: 8085) - Autenticação e Usuários
 
 ![Swagger User Service](assets/photos/swagger-user.png)
 
@@ -310,7 +312,7 @@ microservico/
 - `PUT /users/{id}` - Atualizar dados do usuário (protegido)
 - `DELETE /users/{id}` - Excluir usuário (protegido)
 
-### Product Service (8083)
+### Product Service (Porta Interna: 8083)
 
 ![Swagger Product Service](assets/photos/swagger-product.png)
 
@@ -322,7 +324,7 @@ microservico/
 - `PUT /products/id/{id}` - Atualizar produto existente
 - `DELETE /products/id/{id}` - Deletar produto logicamente
 
-### Inventory Service (8081)
+### Inventory Service (Porta Interna: 8081)
 
 ![Swagger Inventory Service](assets/photos/swagger-inventory.png)
 
@@ -334,7 +336,7 @@ microservico/
 - `PUT /inventory/id/{id}` - Atualizar quantidade em estoque
 - `DELETE /inventory/id/{id}` - Remover item do inventário logicamente
 
-### Order Service (8082)
+### Order Service (Porta Interna: 8082)
 
 ![Swagger Order Service](assets/photos/swagger-order.png)
 
@@ -347,7 +349,7 @@ microservico/
 - `PUT /orders/id/{id}` - Atualizar status do pedido
 - `DELETE /orders/id/{id}` - Cancelar pedido logicamente
 
-### Payments Service (8084)
+### Payments Service (Porta Interna: 8084)
 
 ![Swagger Payments Service](assets/photos/swagger-payments.png)
 
@@ -368,7 +370,7 @@ Cada microserviço possui seu arquivo `application.properties` com as seguintes 
 ```properties
 # User Service
 spring.application.name=user
-server.port=8080
+server.port=8085
 spring.datasource.url=jdbc:postgresql://localhost:5432/user_db
 spring.datasource.username=postgres
 spring.datasource.password=root
@@ -440,6 +442,8 @@ mvn test
 
 ## 🧪 Testando a API
 
+> 💡 **Nota:** Todos os exemplos abaixo apontam para o **API Gateway remoto na porta `8080`**, que atua como ponto de entrada único e roteia a requisição de forma transparente para o microserviço correspondente.
+
 ### Usando cURL
 
 #### 1. Registrar novo usuário
@@ -458,12 +462,12 @@ curl -X POST http://localhost:8080/auth/login \
 
 #### 3. Listar produtos
 ```bash
-curl -X GET http://localhost:8083/products
+curl -X GET http://localhost:8080/products
 ```
 
 #### 4. Criar novo produto
 ```bash
-curl -X POST http://localhost:8083/products \
+curl -X POST http://localhost:8080products \
   -H "Content-Type: application/json" \
   -d '{
     "name":"Produto Test",
@@ -475,7 +479,7 @@ curl -X POST http://localhost:8083/products \
 
 #### 5. Criar pedido
 ```bash
-curl -X POST http://localhost:8082/order \
+curl -X POST http://localhost:8080/order \
   -H "Content-Type: application/json" \
   -d '{
     "userId":1,
@@ -514,22 +518,21 @@ Este projeto foi criado para consolidar conhecimentos em:
 - [x] Boas práticas em Entidades (BigDecimal, Validação de Dados, camelCase fixado)
 - [x] OpenAPI (Swagger) em todos os serviços
 - [x] Paginação e Updates Parciais (null check)
-- [ ] Comunicação Assíncrona via RabbitMQ (Em andamento)
-- [ ] Testes Unitários e de Integração
+- [x] Comunicação Assíncrona via RabbitMQ
+- [x] Testes Unitários e de Integração
 
-## 🔄 Próximos Passos
+## 🏆 Conquistas do Projeto (Finalizado)
 
-- [x] Completar microserviço Product
-- [x] Completar microserviço User com Spring Security
-- [x] Completar microserviço Payments
-- [x] Refatorar Order e Inventory para padrão de excelência (M1)
-- [x] Configurar Docker Compose (100% funcional com 5 serviços)
-- [x] Adicionar autenticação JWT com tokens em todo o sistema
-- [x] Documentação Swagger/OpenAPI
-- [x] Health checks e métricas (Actuator + Prometheus)
-- [ ] Implementar integração com RabbitMQ (Producers e Consumers)
-- [ ] Implementar circuit breaker (Resilience4j) e API Gateway
-- [ ] Melhorar testes (Unit, Integration, E2E)
+- [x] Desenvolvimento de microserviços especializados (Product, User, Payments, Order, Inventory)
+- [x] Refatoração robusta para melhores práticas e padrão de excelência (M1)
+- [x] Orquestração completa de ponta a ponta com Docker Compose
+- [x] Construção de arquitetura impulsionada por fila/mensageria com RabbitMQ
+- [x] Roteamento e autorização centralizada via API Gateway
+- [x] Service Discovery automatizado com Eureka Server
+- [x] Sistema de Autenticação universal distribuída (JWT)
+- [x] Swagger/OpenAPI universal
+- [x] Métricas com Spring Actuator (Visão para Prometheus, Jaeger, etc.)
+- [x] Rotinas rigorosas de infra e builds testados automatizados
 
 ## ⚠️ Troubleshooting
 
@@ -537,7 +540,8 @@ Este projeto foi criado para consolidar conhecimentos em:
 
 | Serviço | Porta | Função |
 |---------|-------|--------|
-| **User Service** | `8080` | Autenticação |
+| **API Gateway** | `8080` | Gateway |
+| **User Service** | `8085` | Autenticação |
 | **Inventory Service** | `8081` | Estoque |
 | **Order Service** | `8082` | Pedidos |
 | **Product Service** | `8083` | Produtos |
@@ -632,4 +636,4 @@ Projeto de aprendizado pessoal.
 ---
 
 **Última atualização:** Março de 2026  
-**Status:** ✅ 5 microserviços completamente refatorados, padronizados (DTOs, Validações, Exceções) e 100% operacionais | Segurança JWT implementada cruzada | RabbitMQ planejado para próxima fase. 🚀
+**Status:** ✅ **PROJETO 100% CONCLUÍDO** | E-commerce escalável totalmente finalizado. API Gateway, Service Discovery, Segurança JWT e Mensageria RabbitMQ implantados e integrados através de containers Docker. Missão cumprida! 🚀
