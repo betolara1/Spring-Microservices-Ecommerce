@@ -37,10 +37,11 @@ public class Inventory {
     public enum Status {
         AVAILABLE,
         RESERVED,
-        OUT_OF_STOCK
+        OUT_OF_STOCK,
+        CANCELLED
     }
 
-    public Status reserved() {
+    public Status hasItemStatus() {
         if (this.quantity > 0)
             return Status.AVAILABLE;
         else

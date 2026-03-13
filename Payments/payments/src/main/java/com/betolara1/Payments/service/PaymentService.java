@@ -116,6 +116,7 @@ public class PaymentService {
     @Transactional
     public void deletePayment(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Pagamento não encontrado com ID: " + id));
-        paymentRepository.delete(payment);
+        payment.setStatus(Payment.Status.CANCELLED);
+        paymentRepository.save(payment);
     }
 }

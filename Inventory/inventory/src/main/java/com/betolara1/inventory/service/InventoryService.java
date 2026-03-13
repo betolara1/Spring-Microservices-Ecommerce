@@ -50,14 +50,14 @@ public class InventoryService {
         Inventory newInventory = new Inventory();
         newInventory.setSku(inventory.getSku());
         newInventory.setQuantity(inventory.getQuantity());
-        newInventory.setStatus(newInventory.reserved());
+        newInventory.setStatus(newInventory.hasItemStatus());
 
         return inventoryRepository.save(newInventory);
     }
 
     @Transactional
     public Inventory updateInventoryEntity(Inventory inventory) {
-        inventory.setStatus(inventory.reserved());
+        inventory.setStatus(inventory.hasItemStatus());
         return inventoryRepository.save(inventory);
     }
 
@@ -81,6 +81,7 @@ public class InventoryService {
     @Transactional
     public void deleteInventory(Long id){
         Inventory findInventory = inventoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Estoque não encontrado com ID: " + id));
-        inventoryRepository.delete(findInventory);
+        findInventory.setStatus(Inventory.Status.CANCELLED);
+        inventoryRepository.save(findInventory);
     }
 }

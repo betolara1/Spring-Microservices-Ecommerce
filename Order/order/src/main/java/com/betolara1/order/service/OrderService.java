@@ -139,8 +139,9 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(Long id){
-        Order finOrder = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Pedido não encontrado com ID: " + id));
-        orderRepository.delete(finOrder);
+        Order findOrder = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Pedido não encontrado com ID: " + id));
+        findOrder.setStatus(Order.Status.CANCELLED);
+        orderRepository.save(findOrder);
     }
 
     // Método para atualizar o status do pedido

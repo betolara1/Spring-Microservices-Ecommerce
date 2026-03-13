@@ -91,7 +91,6 @@ public class UserServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("newuser");
         request.setPassword("password123");
-        request.setRole(User.Role.USER);
         request.setName("Test");
         request.setEmail("test@test.com");
         request.setPhone("123456");
@@ -117,7 +116,6 @@ public class UserServiceTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("existing");
         request.setPassword("password123");
-        request.setRole(User.Role.USER);
         request.setName("Test");
         request.setEmail("test@test.com");
         request.setPhone("123456");

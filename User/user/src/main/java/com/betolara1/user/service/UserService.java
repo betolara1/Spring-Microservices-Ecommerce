@@ -55,6 +55,7 @@ public class UserService implements UserDetailsService {
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(encodedPassword);
+        newUser.setRole(User.Role.USER);
         newUser.setAddress(request.getAddress());
         newUser.setEmail(request.getEmail());
         newUser.setName(request.getName());
@@ -66,10 +67,18 @@ public class UserService implements UserDetailsService {
     public User updateUser(Long id, UpdateUserRequest updatedUser) {
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("Usuario não encontrado com ID: " + id));
 
-        user.setName(updatedUser.getName());
-        user.setEmail(updatedUser.getEmail());
-        user.setPhone(updatedUser.getPhone());
-        user.setAddress(updatedUser.getAddress());
+        if (updatedUser.getName() != null) {
+            user.setName(updatedUser.getName());
+        }
+        if (updatedUser.getEmail() != null) {
+            user.setEmail(updatedUser.getEmail());
+        }
+        if (updatedUser.getPhone() != null) {
+            user.setPhone(updatedUser.getPhone());
+        }
+        if (updatedUser.getAddress() != null) {
+            user.setAddress(updatedUser.getAddress());
+        }
 
         return userRepository.save(user);
     }

@@ -47,7 +47,8 @@ public class Payment {
         PENDING,
         COMPLETED,
         FAILED,
-        REFUND
+        REFUND,
+        CANCELLED
     }
 
     @PrePersist

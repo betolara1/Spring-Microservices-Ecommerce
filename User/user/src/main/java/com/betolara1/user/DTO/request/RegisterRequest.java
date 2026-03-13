@@ -1,9 +1,6 @@
 package com.betolara1.user.dto.request;
 
-import com.betolara1.user.model.User;
-
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
