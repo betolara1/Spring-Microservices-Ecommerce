@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/products")
 public class ProductController {
 
-    private ProductService productService;
+    private final ProductService productService;
     public ProductController(ProductService productService) {
         this.productService = productService;
     }

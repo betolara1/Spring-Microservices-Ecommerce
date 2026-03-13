@@ -1,0 +1,13 @@
+
+/User/user/target/
+/Product/product/target/
+/Inventory/inventory/target/
+/Order/order/target/
+/Payments/payments/target/
+/Gateway/gateway/target/
+/Eureka/eureka/target/
+*.class
+*.jar
+.classpath
+.project
+.settings/
