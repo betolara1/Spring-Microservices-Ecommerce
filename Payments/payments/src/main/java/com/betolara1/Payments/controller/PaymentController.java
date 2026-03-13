@@ -32,7 +32,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping("/get/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(            
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
@@ -58,7 +58,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/get/status={status}")
+    @GetMapping("/status={status}")
     public ResponseEntity<Page<PaymentDTO>> getPaymentByStatus(
             @PathVariable Payment.Status status, 
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -77,7 +77,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/get/paymentMethod={paymentMethod}")
+    @GetMapping("/paymentMethod={paymentMethod}")
     public ResponseEntity<Page<PaymentDTO>> getPaymentByPaymentMethod(
             @PathVariable String paymentMethod, 
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -95,7 +95,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/get/id={id}")
+    @GetMapping("/id={id}")
     public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             PaymentDTO payment = paymentService.getPaymentById(id);
@@ -106,7 +106,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/get/orderId={orderId}")
+    @GetMapping("/orderId={orderId}")
     public ResponseEntity<PaymentDTO> getPaymentByOrderId(@PathVariable Long orderId, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             PaymentDTO payment = paymentService.getPaymentByOrderId(orderId);
@@ -117,7 +117,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/get/transactionId={transactionId}")
+    @GetMapping("/transactionId={transactionId}")
     public ResponseEntity<PaymentDTO> getPaymentByTransactionId(@PathVariable String transactionId, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             PaymentDTO payment = paymentService.getPaymentByTransactionId(transactionId);
@@ -133,14 +133,14 @@ public class PaymentController {
         if(role.equals("ADMIN")){
             Payment savedPayment = paymentService.savePayment(request);
             PaymentDTO paymentDTO = new PaymentDTO(savedPayment);
-            return ResponseEntity.ok(paymentDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(paymentDTO);
         }
         else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<PaymentDTO> updatePayment(@Valid @RequestBody UpdatePaymentsRequest request, @PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             Payment updatedPayment = paymentService.updatePayment(id, request);
@@ -152,7 +152,7 @@ public class PaymentController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePayment(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             paymentService.deletePayment(id);

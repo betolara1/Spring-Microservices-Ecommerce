@@ -35,7 +35,7 @@ public class PaymentListener {
             CreatePaymentsRequest savePayment = new CreatePaymentsRequest();
             savePayment.setOrderId(event.orderId());
             savePayment.setAmount(event.totalPrice());
-            savePayment.setStatus(Payment.Status.COMPLETED); // Intenção inicial
+            savePayment.setStatus(Payment.Status.PENDING); // Intenção inicial
             savePayment.setPaymentMethod("CREDIT_CARD");
             savePayment.setTransactionId(UUID.randomUUID().toString());
             savePayment.setPaymentDate(LocalDateTime.now());
@@ -46,7 +46,7 @@ public class PaymentListener {
             // 3. (PRÓXIMO PASSO) Enviar uma nova mensagem para o RabbitMQ dizendo: "Pagamento Aprovado!"
             // Assim o Order pode escutar essa nova mensagem e atualizar o status para PAID.
 
-            if (processedPayment.getStatus() == Payment.Status.COMPLETED) {
+            if (processedPayment.getStatus() == Payment.Status.PENDING) {
                 PaymentEvent paymentApprovedEvent = new PaymentEvent(event.orderId(), event.totalPrice());
                 rabbitTemplate.convertAndSend("ecommerce.exchange", "payment.ok", paymentApprovedEvent);
             } else {

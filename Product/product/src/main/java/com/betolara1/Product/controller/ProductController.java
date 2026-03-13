@@ -32,7 +32,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/get/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<Page<ProductDTO>> getAllProducts(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     // Busca por ID
-    @GetMapping("/get/id={id}")
+    @GetMapping("/id={id}")
     public ResponseEntity<Page<ProductDTO>> getProductById(@PathVariable Long id, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<ProductDTO> product;
         product = productService.getProductById(id, page, size);
@@ -53,7 +53,7 @@ public class ProductController {
     }
 
     // Busca por nome
-    @GetMapping("/get/name={name}")
+    @GetMapping("/name={name}")
     public ResponseEntity<Page<ProductDTO>> getProductByName(@PathVariable String name, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<ProductDTO> product;
         product = productService.getProductByName(name, page, size);
@@ -61,7 +61,7 @@ public class ProductController {
     }
 
     // Busca por SKU
-    @GetMapping("/get/sku={sku}")
+    @GetMapping("/sku={sku}")
     public ResponseEntity<Page<ProductDTO>> getProductBySku(@PathVariable String sku, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<ProductDTO> product;
         product = productService.getProductBySku(sku, page, size);
@@ -69,13 +69,13 @@ public class ProductController {
     }
 
     // Busca por categoria
-    @GetMapping("/get/category={categoryId}")
+    @GetMapping("/category={categoryId}")
     public ResponseEntity<Page<ProductDTO>> getProductByCategoryId(@PathVariable Long categoryId, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<ProductDTO> product = productService.getProductByCategoryId(categoryId, page, size);
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/get/active={active}")
+    @GetMapping("/active={active}")
     public ResponseEntity<Page<ProductDTO>> getProductByActive(@PathVariable boolean active, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<ProductDTO> product = productService.getProductByActive(active, page, size);
         return ResponseEntity.ok(product);
@@ -87,14 +87,14 @@ public class ProductController {
             Product newProduct = productService.saveProduct(request);
             ProductDTO createdProductDTO = new ProductDTO(newProduct);
 
-            return ResponseEntity.ok(createdProductDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProductDTO);
         }
         else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             Product updatedProduct = productService.updateProduct(id, request);
@@ -107,7 +107,7 @@ public class ProductController {
         } 
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id, @RequestHeader("X-User-Role") String role) {
         if(role.equals("ADMIN")){
             productService.deleteProduct(id);

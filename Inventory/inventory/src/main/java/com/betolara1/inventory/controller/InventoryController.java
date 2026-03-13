@@ -31,7 +31,7 @@ public class InventoryController {
         this.inventoryService = inventoryService;
     }
 
-    @GetMapping("/get/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<Page<InventoryDTO>> getAllInventory(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
@@ -45,7 +45,7 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/get/status={status}")
+    @GetMapping("/status={status}")
     public ResponseEntity<Page<InventoryDTO>> getInventoryByStatus(
         @PathVariable Inventory.Status status,
         @RequestParam(value = "page", defaultValue = "0") int page,
@@ -60,7 +60,7 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/get/id={id}")
+    @GetMapping("/id={id}")
     public ResponseEntity<InventoryDTO> getInventoryById(@PathVariable Long id,
         @RequestHeader("X-User-Role") String role){
             
@@ -73,7 +73,7 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/get/sku={sku}")
+    @GetMapping("/sku={sku}")
     public ResponseEntity<InventoryDTO> getInventoryBySku(@PathVariable String sku,
         @RequestHeader("X-User-Role") String role){
             
@@ -94,14 +94,14 @@ public class InventoryController {
         if(role.equals("ADMIN")){
             Inventory newInventory = inventoryService.saveInventory(inventory);
             InventoryDTO inventoryDTO = new InventoryDTO(newInventory);
-            return ResponseEntity.ok(inventoryDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryDTO);
         }
         else{
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<InventoryDTO> updateInventory(
             @PathVariable Long id, 
             @Valid @RequestBody UpdateInventoryRequest inventory,
@@ -117,7 +117,7 @@ public class InventoryController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteInventory(
             @PathVariable Long id,
             @RequestHeader("X-User-Role") String role){

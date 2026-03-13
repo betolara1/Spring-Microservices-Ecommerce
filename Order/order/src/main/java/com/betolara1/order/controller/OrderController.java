@@ -32,7 +32,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/get/getAll")
+    @GetMapping("/getAll")
     public ResponseEntity<Page<OrderDTO>> getAllOrder(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
@@ -50,7 +50,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/get/customerId={customerId}")
+    @GetMapping("/customerId={customerId}")
     public ResponseEntity<Page<OrderDTO>> getOrderByCustomerId(
             @PathVariable Long customerId,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -66,7 +66,7 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/get/status={status}")
+    @GetMapping("/status={status}")
     public ResponseEntity<Page<OrderDTO>> getOrderByStatus(
             @PathVariable Order.Status status,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -86,7 +86,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/get/orderDate={orderDate}")
+    @GetMapping("/orderDate={orderDate}")
     public ResponseEntity<Page<OrderDTO>> getOrderByOrderDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) java.time.LocalDate orderDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -103,7 +103,7 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/get/id={id}")
+    @GetMapping("/id={id}")
     public ResponseEntity<OrderDTO> getOrderById(
             @PathVariable Long id,
             @RequestHeader("X-User-Role") String role,
@@ -130,10 +130,10 @@ public class OrderController {
         Order newOrder = orderService.saveOrder(request);
         OrderDTO orderDTO = new OrderDTO(newOrder);
 
-        return ResponseEntity.ok(orderDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(
             @PathVariable Long id, 
             @Valid @RequestBody UpdateOrderRequest request,
@@ -148,7 +148,7 @@ public class OrderController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteOrder(@PathVariable Long id, @RequestHeader("X-User-Role") String role){
         if(role.equals("ADMIN")){
             orderService.deleteOrder(id);
