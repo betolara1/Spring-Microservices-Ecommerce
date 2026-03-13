@@ -1,18 +1,17 @@
 # Estágio 1: Build
-FROM eclipse-temurin:21-jdk-jammy AS builder
+FROM maven:3.9.6-eclipse-temurin-21-jammy AS builder
 WORKDIR /build
 
-# 1. Copia o Maven Wrapper e o pom.xml primeiro
-COPY product/.mvn/ .mvn
-COPY product/mvnw product/pom.xml ./
+# 1. Copia o pom.xml primeiro
+COPY product/pom.xml ./
 
 # 2. Baixa as dependências (camada pesada que será cacheada)
 # Isso só rodará de novo se o seu pom.xml mudar
-RUN ./mvnw dependency:go-offline -Dhttps.protocols=TLSv1.2,TLSv1.3
+RUN mvn dependency:go-offline -B -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=5 -Dhttps.protocols=TLSv1.2,TLSv1.3
 
 # 3. Agora sim copia o código fonte e gera o JAR
 COPY product/src ./src
-RUN ./mvnw clean package -DskipTests -Dhttps.protocols=TLSv1.2,TLSv1.3
+RUN mvn clean package -DskipTests -B -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.http.retryHandler.count=5 -Dhttps.protocols=TLSv1.2,TLSv1.3
 
 
 # Estágio 2: Runtime (Imagem final bem leve)

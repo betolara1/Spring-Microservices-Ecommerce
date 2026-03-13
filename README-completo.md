@@ -33,7 +33,7 @@ meu-ecommerce-microservicos/
 ### 📦 Microserviços
 
 #### **User (Autenticação e Usuários)**
-- **Porta:** 8080
+- **Porta:** 8085
 - **Descrição:** Autenticação (JWT, Login, Registro), gestão de usuários
 - **Java Version:** 21 (Docker runtime) / 17 (Source)
 - **Dependências principais:** Spring Data JPA, Spring Security, JWT, Swagger, Actuator

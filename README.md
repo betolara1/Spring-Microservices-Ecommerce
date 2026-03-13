@@ -1,6 +1,6 @@
 # 🛒 E-commerce Microserviços
 
-Um projeto de e-commerce desenvolvido com **Spring Boot 3.4.3** e **Java 17**, utilizando arquitetura de **microserviços** para aprender e praticar várias funcionalidades avançadas do Spring Boot.
+Um projeto de e-commerce desenvolvido com **Spring Boot 3.5.8** e **Java 17**, utilizando arquitetura de **microserviços** para aprender e praticar várias funcionalidades avançadas do Spring Boot.
 
 > ✅ **Status:** Fases 1 a 4 Concluídas — Todos os 5 microserviços foram completamente refatorados, padronizados e estão 100% operacionais. (Fase 5: Mensageria RabbitMQ em andamento).
 
@@ -16,7 +16,81 @@ Este projeto implementa um sistema de e-commerce com múltiplos microserviços i
 - ✅ API REST
 - ✅ Containerização com Docker
 
+### 💡 Funcionalidades Principais
+- **Cadastro e Autenticação:** Gestão e autorização de usuários com JWT.
+- **Catálogo de Produtos:** CRUD completo de produtos, categorias e preços.
+- **Controle de Estoque:** Verificação e baixa de inventário.
+- **Pedidos:** Processamento do carrinho e criação de pedidos.
+- **Pagamentos:** Simulação e processamento de transações financeiras.
+
 ## 🏗️ Arquitetura
+
+```mermaid
+graph TD
+    Client[Cliente/Frontend]
+    
+    subgraph "API / Entrypoints"
+        Gateway[API Gateway / Ingress]
+    end
+
+    subgraph "Microserviços"
+        US[User Service<br/>Porta: 8080]
+        PS[Product Service<br/>Porta: 8083]
+        IS[Inventory Service<br/>Porta: 8081]
+        OS[Order Service<br/>Porta: 8082]
+        PayS[Payments Service<br/>Porta: 8084]
+    end
+
+    subgraph "Mensageria"
+        RabbitMQ[(RabbitMQ<br/>Message Broker)]
+    end
+
+    subgraph "Bancos de Dados PostgreSQL"
+        DB_User[(user_db)]
+        DB_Prod[(product_db)]
+        DB_Inv[(inventory_db)]
+        DB_Ord[(order_db)]
+        DB_Pay[(payments_db)]
+    end
+
+    Client -->|HTTP/REST| Gateway
+    Gateway --> US
+    Gateway --> PS
+    Gateway --> IS
+    Gateway --> OS
+    Gateway --> PayS
+
+    US --> DB_User
+    PS --> DB_Prod
+    IS --> DB_Inv
+    OS --> DB_Ord
+    PayS --> DB_Pay
+
+    %% Comunicação Síncrona (Feign/REST)
+    US -.->|Token Validação| OS
+    US -.->|Token Validação| PayS
+    
+    %% Comunicação Assíncrona (RabbitMQ)
+    OS ==>|Criação de Pedido<br/>Reserva de Estoque| RabbitMQ
+    RabbitMQ ==>|Consome| IS
+    
+    IS ==>|Confirmação de Reserva| RabbitMQ
+    RabbitMQ ==>|Consome| OS
+    
+    OS ==>|Solicita Pagamento| RabbitMQ
+    RabbitMQ ==>|Consome| PayS
+    
+    PayS ==>|Status do Pagamento| RabbitMQ
+    RabbitMQ ==>|Consome| OS
+
+    classDef service fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef db fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef broker fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    
+    class US,PS,IS,OS,PayS service;
+    class DB_User,DB_Prod,DB_Inv,DB_Ord,DB_Pay db;
+    class RabbitMQ broker;
+```
 
 O projeto está organizado em cinco microserviços principais:
 
@@ -191,6 +265,14 @@ Order Service → Mensagem RabbitMQ → Payments Service (8084)
 Order Service recebe confirmação → Atualiza status do pedido
 ```
 
+## 🔒 Segurança
+
+O projeto foca fortemente em boas práticas de mercado para rotas e dados sensíveis:
+- **JWT (JSON Web Token):** Utilizado para autenticação e proteção de endpoints privados (ex: atualizações e exclusões).
+- **Criptografia BCrypt:** Senhas de usuários são tratadas e salvas de forma segura no banco de dados.
+- **Autorização via Header:** As rotas protegidas validam o token passado no cabeçalho `Authorization: Bearer <token>`.
+- **Controle de Acesso:** Permissões estruturadas (Roles) e restrição para endpoints críticos.
+
 ## 🗂️ Estrutura de Projeto
 
 Cada microserviço segue a seguinte estrutura:
@@ -219,7 +301,7 @@ microservico/
 
 ### User Service (8080) - Autenticação e Usuários
 
-![Swagger User Service](assets/photos/user.png)
+![Swagger User Service](assets/photos/swagger-user.png)
 
 - `POST /auth/register` - Registrar novo usuário
 - `POST /auth/login` - Fazer login
@@ -230,7 +312,7 @@ microservico/
 
 ### Product Service (8083)
 
-![Swagger Product Service](assets/photos/Product.png)
+![Swagger Product Service](assets/photos/swagger-product.png)
 
 - `GET /products/listAll` - Listar todos os produtos (paginado)
 - `GET /products/{identifier}` - Buscar produto por ID ou Nome exato
@@ -242,7 +324,7 @@ microservico/
 
 ### Inventory Service (8081)
 
-![Swagger Inventory Service](assets/photos/Inventory.png)
+![Swagger Inventory Service](assets/photos/swagger-inventory.png)
 
 - `GET /inventory/listAll` - Listar todo o inventário (paginado)
 - `GET /inventory/status/{status}` - Buscar inventário por status (AVAILABLE, OUT_OF_STOCK)
@@ -254,7 +336,7 @@ microservico/
 
 ### Order Service (8082)
 
-![Swagger Order Service](assets/photos/Order.png)
+![Swagger Order Service](assets/photos/swagger-order.png)
 
 - `GET /orders/listAll` - Listar todos os pedidos (paginado)
 - `GET /orders/customerId/{customerId}` - Buscar pedidos de um cliente
@@ -267,7 +349,7 @@ microservico/
 
 ### Payments Service (8084)
 
-![Swagger Payments Service](assets/photos/Payments.png)
+![Swagger Payments Service](assets/photos/swagger-payments.png)
 
 - `GET /payments/listAll` - Listar todos os pagamentos (paginado)
 - `GET /payments/status/{status}` - Buscar pagamentos por status
@@ -405,9 +487,13 @@ curl -X POST http://localhost:8082/order \
 
 ### Usando Postman ou Insomnia
 
+![Insomnia Postman JWT Auth](assets/photos/insomnia-postman-auth.png)
+
 Você pode importar os endpoints no Postman/Insomnia para testes mais completos. Crie uma coleção com as requisições acima e teste os fluxos completos.
 
 ### Verificando RabbitMQ
+
+![Painel do RabbitMQ](assets/photos/rabbitmq-dashboard.png)
 
 Acesse a interface web do RabbitMQ:
 ```
