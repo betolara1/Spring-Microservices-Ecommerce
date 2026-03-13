@@ -30,27 +30,27 @@ graph TD
     Client[Cliente/Frontend]
     
     subgraph "API / Entrypoints"
-        Gateway[API Gateway / Ingress]
+        Gateway["API Gateway / Ingress"]
     end
 
     subgraph "Microserviços"
-        US[User Service<br/>Porta: 8085]
-        PS[Product Service<br/>Porta: 8083]
-        IS[Inventory Service<br/>Porta: 8081]
-        OS[Order Service<br/>Porta: 8082]
-        PayS[Payments Service<br/>Porta: 8084]
+        US["User Service<br/>Porta: 8085"]
+        PS["Product Service<br/>Porta: 8083"]
+        IS["Inventory Service<br/>Porta: 8081"]
+        OS["Order Service<br/>Porta: 8082"]
+        PayS["Payments Service<br/>Porta: 8084"]
     end
 
     subgraph "Mensageria"
-        RabbitMQ[(RabbitMQ<br/>Message Broker)]
+        RabbitMQ[("(RabbitMQ<br/>Message Broker)")]
     end
 
     subgraph "Bancos de Dados PostgreSQL"
-        DB_User[(user_db)]
-        DB_Prod[(product_db)]
-        DB_Inv[(inventory_db)]
-        DB_Ord[(order_db)]
-        DB_Pay[(payments_db)]
+        DB_User[("(user_db)")]
+        DB_Prod[("(product_db)")]
+        DB_Inv[("(inventory_db)")]
+        DB_Ord[("(order_db)")]
+        DB_Pay[("(payments_db)")]
     end
 
     Client -->|HTTP/REST| Gateway
@@ -71,7 +71,7 @@ graph TD
     US -.->|Token Validação| PayS
     
     %% Comunicação Assíncrona (RabbitMQ)
-    OS ==>|Criação de Pedido<br/>Reserva de Estoque| RabbitMQ
+    OS ==>|"Criação de Pedido<br/>Reserva de Estoque"| RabbitMQ
     RabbitMQ ==>|Consome| IS
     
     IS ==>|Confirmação de Reserva| RabbitMQ
@@ -303,7 +303,7 @@ microservico/
 
 ### User Service (Porta Interna: 8085) - Autenticação e Usuários
 
-![Swagger User Service](assets/photos/swagger-user.png)
+![Swagger User Service](assets/photos/user.png)
 
 - `POST /auth/register` - Registrar novo usuário
 - `POST /auth/login` - Fazer login
