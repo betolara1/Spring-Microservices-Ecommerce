@@ -226,16 +226,16 @@ cd product
   <img src="assets/photos/user.png" width="100%">
   <br/><br/>
   <h4>Product Service</h4>
-  <img src="assets/photos/swagger-product.png" width="100%">
+  <img src="assets/photos/Product.png" width="100%">
   <br/><br/>
   <h4>Inventory Service</h4>
-  <img src="assets/photos/swagger-inventory.png" width="100%">
+  <img src="assets/photos/Inventory.png" width="100%">
   <br/><br/>
   <h4>Order Service</h4>
-  <img src="assets/photos/swagger-order.png" width="100%">
+  <img src="assets/photos/Order.png" width="100%">
   <br/><br/>
   <h4>Payments Service</h4>
-  <img src="assets/photos/swagger-payments.png" width="100%">
+  <img src="assets/photos/Payments.png" width="100%">
 </div>
 
 ---
