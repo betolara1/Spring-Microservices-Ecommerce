@@ -18,14 +18,6 @@
 
 ---
 
-## 📸 Preview (Swagger UI)
-
-<div align="center">
-  <img src="assets/photos/swagger-product.png" alt="Swagger UI Preview" width="100%">
-</div>
-
----
-
 ## 📌 Sobre o Projeto
 
 Este projeto implementa um sistema de e-commerce robusto baseado em **microserviços independentes**, que se comunicam de forma assíncrona através de um Message Broker (**RabbitMQ/AMQP**). O objetivo principal é fornecer uma plataforma escalável, onde cada domínio (Usuários, Produtos, Inventário, Pedidos e Pagamentos) possui seu próprio ciclo de vida e banco de dados.
@@ -209,17 +201,6 @@ cd product
 
 ---
 
-## 📊 Monitoramento e Documentação
-
-### Swagger UI
-Cada microserviço expõe sua própria documentação OpenAPI. Através do Gateway, você pode acessar:
-- `http://localhost:8080/swagger-ui.html` (Roteado para o serviço configurado)
-
-### Spring Actuator
-Métricas e saúde disponíveis em cada serviço no path `/actuator/health`.
-
----
-
 ## 🛠️ Stack Tecnológica
 
 | Tecnologia | Versão | Finalidade |
@@ -233,6 +214,41 @@ Métricas e saúde disponíveis em cada serviço no path `/actuator/health`.
 | Spring Security + JWT | — | Segurança distribuída |
 | Netflix Eureka | — | Service Discovery |
 | Docker + Compose | — | Orquestração |
+
+---
+
+## 📸 Screenshots e Documentação Visual
+
+### 📑 Documentação da API (Swagger UI)
+
+<div align="center">
+  <h4>User Service</h4>
+  <img src="assets/photos/user.png" width="100%">
+  <br/><br/>
+  <h4>Product Service</h4>
+  <img src="assets/photos/swagger-product.png" width="100%">
+  <br/><br/>
+  <h4>Inventory Service</h4>
+  <img src="assets/photos/swagger-inventory.png" width="100%">
+  <br/><br/>
+  <h4>Order Service</h4>
+  <img src="assets/photos/swagger-order.png" width="100%">
+  <br/><br/>
+  <h4>Payments Service</h4>
+  <img src="assets/photos/swagger-payments.png" width="100%">
+</div>
+
+---
+
+### 🛠️ Ferramentas e Integração
+
+<div align="center">
+  <h4>Painel de Controle RabbitMQ</h4>
+  <img src="assets/photos/rabbitmq-dashboard.png" width="100%">
+  <br/><br/>
+  <h4>Testes de Autenticação (JWT)</h4>
+  <img src="assets/photos/insomnia-postman-auth.png" width="100%">
+</div>
 
 ---
 
